@@ -1,0 +1,208 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <meta name="theme-color" content="#0f1020" />
+  <link rel="icon" type="image/png" href="assets/images/logo-layer-sun.png" />
+  <title>Cruisin AC</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+  <link href="https://fonts.googleapis.com/css2?family=Orbitron:wght@500;700;800&family=Rajdhani:wght@400;500;600;700&display=swap" rel="stylesheet" />
+  <link rel="stylesheet" href="styles.css" />
+</head>
+<body>
+  <div class="backdrop" aria-hidden="true"></div>
+  <div class="scanlines" aria-hidden="true"></div>
+
+  <div class="intro" id="intro" aria-hidden="true">
+    <div class="intro__logo" aria-hidden="true">
+      <img class="intro__layer intro__layer--sun" src="assets/images/logo-layer-sun.png" alt="" />
+      <img class="intro__layer intro__layer--cruisin" src="assets/images/logo-layer-cruisin.png" alt="" />
+      <img class="intro__layer intro__layer--ac" src="assets/images/logo-layer-ac.png" alt="" />
+    </div>
+    <p class="intro__text">Presents</p>
+  </div>
+
+  <section class="view" id="viewStart" data-view="start" hidden>
+    <main class="start-gate" id="startGate">
+      <img class="start-gate__logo" id="startGateLogo" src="assets/images/initial-driftrun-placeholder.svg" alt="Initial DriftRun logo" />
+      <p class="start-gate__prompt" id="startGatePrompt">Press Enter to Start</p>
+      <nav class="start-menu" id="startMenu" aria-label="Game menu">
+        <a class="start-menu__item start-menu__item--primary" href="#level-select" data-view-link="level-select">Level Select</a>
+        <span class="start-menu__item start-menu__item--disabled" aria-disabled="true">Options</span>
+        <a class="start-menu__item" href="#leaderboard" data-view-link="leaderboard">Leaderboard</a>
+        <a class="start-menu__item" href="#credits" data-view-link="credits">Credits</a>
+      </nav>
+    </main>
+  </section>
+
+  <section class="view" id="viewLevelSelect" data-view="level-select" hidden>
+    <main class="page">
+      <section class="panel">
+        <div class="page-bar">
+          <a class="button button--ghost" href="#start" data-view-link="start">Back</a>
+        </div>
+
+        <div class="level-select__header">
+          <img class="level-select__logo" src="assets/images/initial-driftrun-placeholder.svg" alt="Initial DriftRun logo" />
+          <h2 class="level-select__title">Level Select</h2>
+        </div>
+
+        <div class="level-select" role="list" aria-label="Initial DriftRun level select">
+          <a class="level-card" role="listitem">
+            <div class="level-card__rank">01</div>
+            <div class="level-card__preview">
+              <img src="assets/images/tracks/level-01-myogi-downhill.png" alt="Myogi Downhill preview" />
+            </div>
+            <div class="level-card__body">
+              <h3>Myogi Downhill</h3>
+              <p>First course in the drift progression.</p>
+            </div>
+            <span class="status status--checking">Checking</span>
+          </a>
+
+          <a class="level-card" role="listitem">
+            <div class="level-card__rank">02</div>
+            <div class="level-card__preview">
+              <img src="assets/images/tracks/level-02-momiji-downhill.png" alt="Momiji Line Downhill preview" />
+            </div>
+            <div class="level-card__body">
+              <h3>Momiji Line Downhill</h3>
+              <p>Steeper rhythm, tighter lines, harder exits.</p>
+            </div>
+            <span class="status status--checking">Checking</span>
+          </a>
+
+          <a class="level-card" role="listitem">
+            <div class="level-card__rank">03</div>
+            <div class="level-card__preview">
+              <img src="assets/images/tracks/level-03-tsukuba-fruits-outbound.png" alt="Tsukuba Fruits Line Outbound preview" />
+            </div>
+            <div class="level-card__body">
+              <h3>Tsukuba Fruits Line Outbound</h3>
+              <p>Outbound run with fast transitions and flow.</p>
+            </div>
+            <span class="status status--checking">Checking</span>
+          </a>
+
+          <a class="level-card" role="listitem">
+            <div class="level-card__rank">04</div>
+            <div class="level-card__preview">
+              <img src="assets/images/tracks/level-04-akina-downhill.png" alt="Mt Akina Downhill preview" />
+            </div>
+            <div class="level-card__body">
+              <h3>Mt Akina Downhill</h3>
+              <p>The classic downhill benchmark of the set.</p>
+            </div>
+            <span class="status status--checking">Checking</span>
+          </a>
+
+          <a class="level-card" role="listitem">
+            <div class="level-card__rank">05</div>
+            <div class="level-card__preview">
+              <img src="assets/images/tracks/level-05-tsubaki-downhill.png" alt="Tsubaki Line Downhill preview" />
+            </div>
+            <div class="level-card__body">
+              <h3>Tsubaki Line Downhill</h3>
+              <p>Final mockup level in the current five-course list.</p>
+            </div>
+            <span class="status status--checking">Checking</span>
+          </a>
+
+          <a class="level-card" role="listitem">
+            <div class="level-card__rank">06</div>
+            <div class="level-card__preview">
+              <img src="assets/images/tracks/level-06-irohazaka-downhill.png" alt="Irohazaka Downhill preview" />
+            </div>
+            <div class="level-card__body">
+              <h3>Irohazaka Downhill</h3>
+              <p>Sixth course in the drift progression.</p>
+            </div>
+            <span class="status status--checking">Checking</span>
+          </a>
+        </div>
+      </section>
+    </main>
+  </section>
+
+  <section class="view" id="viewLeaderboard" data-view="leaderboard" hidden>
+    <main class="page">
+      <section class="panel">
+        <div class="page-bar">
+          <a class="button button--ghost" href="#start" data-view-link="start">Back</a>
+        </div>
+
+        <div class="level-select__header">
+          <img class="level-select__logo" src="assets/images/initial-driftrun-placeholder.svg" alt="Initial DriftRun logo" />
+          <h2 class="level-select__title">Leaderboard</h2>
+        </div>
+
+        <div class="leaderboard-tabs" id="leaderboardTabs" role="tablist" aria-label="Choose a level"></div>
+
+        <div class="leaderboard">
+          <div class="leaderboard__heading">
+            <h3 id="leaderboardLevelName">Level</h3>
+            <p class="leaderboard__rule">
+              Each driver's best finished run, Steam-verified only. Highest score ranks first; a tied score goes to the faster time.
+            </p>
+          </div>
+          <p class="leaderboard__message" id="leaderboardMessage" role="status"></p>
+          <div class="leaderboard__table-wrap">
+            <table class="leaderboard__table" id="leaderboardTable" hidden>
+              <thead>
+                <tr>
+                  <th scope="col">Rank</th>
+                  <th scope="col">Driver</th>
+                  <th class="leaderboard__car" scope="col">Car</th>
+                  <th class="num" scope="col">Score</th>
+                  <th class="num" scope="col">Time</th>
+                  <th class="leaderboard__date" scope="col">Date</th>
+                </tr>
+              </thead>
+              <tbody id="leaderboardBody"></tbody>
+            </table>
+          </div>
+          <p class="leaderboard__updated" id="leaderboardUpdated"></p>
+        </div>
+      </section>
+    </main>
+  </section>
+
+  <section class="view" id="viewCredits" data-view="credits" hidden>
+    <main class="page">
+      <section class="panel">
+        <div class="page-bar">
+          <a class="button button--ghost" href="#start" data-view-link="start">Back</a>
+        </div>
+
+        <div class="section-heading">
+          <div>
+            <div class="eyebrow">Credits</div>
+            <h2>Music acknowledgement</h2>
+          </div>
+          <p>
+            Initial DriftRun and Cruisin AC use music by Wolf and Raven.
+          </p>
+        </div>
+
+        <a class="credit-card" href="https://www.wolfandravenmusic.com/" target="_blank" rel="noreferrer">
+          <img class="credit-card__logo" src="assets/images/wolf-and-raven-logo.jpg" alt="Wolf and Raven logo" />
+          <div class="credit-card__copy">
+            <h3>Wolf and Raven</h3>
+            <p>Featured albums: Tribute to OutRun and Tokyo Turbo</p>
+            <span>Visit wolfandravenmusic.com</span>
+          </div>
+        </a>
+      </section>
+    </main>
+  </section>
+
+  <audio id="bgMusic" src="assets/audio/Wolf%20and%20Raven%20-%20Lair%20of%20the%20Dragon%20-%2002%20Spirit%20Warriors.mp3" preload="auto" loop></audio>
+  <button id="muteToggle" class="mute-toggle" type="button" aria-label="Mute music" aria-pressed="false">
+    <span class="mute-toggle__icon" aria-hidden="true">🔊</span>
+  </button>
+
+  <script src="script.js"></script>
+</body>
+</html>

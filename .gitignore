@@ -1,0 +1,16 @@
+# Dependencies and build output
+node_modules/
+dist/
+build/
+.venv/
+__pycache__/
+
+# Local environment and secrets - never commit API keys, database passwords or Steam keys
+.env
+.env.*
+!.env.example
+
+# Editor and OS clutter
+.vscode/
+.DS_Store
+Thumbs.db
