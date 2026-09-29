@@ -21,6 +21,14 @@ const LEVELS = [
 // Level shown when the leaderboard opens: the only one running the plugin so far.
 const DEFAULT_LEADERBOARD_LEVEL = 6;
 
+// The two boards the API offers (`sort=`), and how each one ranks. The rule is
+// shown under the level name so what drives the numbers is always visible.
+const LEADERBOARD_SORTS = {
+  score: { best: 'best-scoring', rule: 'Highest score ranks first; a tied score goes to the faster time.' },
+  time: { best: 'fastest', rule: 'Lowest time ranks first; a tied time goes to whoever set it first.' },
+};
+const DEFAULT_LEADERBOARD_SORT = 'score';
+
 window.addEventListener('load', () => {
   const intro = document.getElementById('intro');
   const bgMusic = document.getElementById('bgMusic');
@@ -32,6 +40,9 @@ window.addEventListener('load', () => {
   const levelCards = document.querySelectorAll('.level-card');
   const leaderboardTabs = document.getElementById('leaderboardTabs');
   const leaderboardLevelName = document.getElementById('leaderboardLevelName');
+  const leaderboardSort = document.getElementById('leaderboardSort');
+  const leaderboardCar = document.getElementById('leaderboardCar');
+  const leaderboardRule = document.getElementById('leaderboardRule');
   const leaderboardMessage = document.getElementById('leaderboardMessage');
   const leaderboardTable = document.getElementById('leaderboardTable');
   const leaderboardBody = document.getElementById('leaderboardBody');
@@ -93,6 +104,9 @@ window.addEventListener('load', () => {
   // ---- Leaderboard ----
 
   let leaderboardLevel = LEVELS.find((l) => l.number === DEFAULT_LEADERBOARD_LEVEL) || LEVELS[0];
+  let leaderboardSortKey = DEFAULT_LEADERBOARD_SORT;
+  let leaderboardCarKey = ''; // a car's model folder, or '' for all cars
+  let carNames = new Map(); // model folder -> display name, from GET /cars
   let leaderboardTimer = null;
   let leaderboardRequest = 0;
 
@@ -111,6 +125,10 @@ window.addEventListener('load', () => {
   // "ks_toyota_ae86_tuned" -> "toyota ae86 tuned" (shown uppercase by CSS)
   const formatCar = (car) => car.replace(/^ks_/, '').replace(/_/g, ' ');
 
+  // The car's display name from GET /cars, or a tidied-up folder name until
+  // that list has loaded (or if it never does).
+  const carName = (car) => carNames.get(car) || formatCar(car);
+
   const formatDate = (timestamp) =>
     new Date(timestamp).toLocaleDateString(undefined, { year: 'numeric', month: 'short', day: 'numeric' });
 
@@ -123,9 +141,9 @@ window.addEventListener('load', () => {
     const columns = [
       { className: 'leaderboard__rank', value: (e) => twoDigits(e.rank) },
       { className: 'leaderboard__name', value: (e) => e.name },
-      { className: 'leaderboard__car', value: (e) => formatCar(e.car) },
-      { className: 'num leaderboard__score', value: (e) => formatScore(e.score) },
-      { className: 'num', value: (e) => formatTime(e.total_time_seconds) },
+      { className: 'leaderboard__car', value: (e) => carName(e.car) },
+      { className: 'num leaderboard__col-score', value: (e) => formatScore(e.score) },
+      { className: 'num leaderboard__col-time', value: (e) => formatTime(e.total_time_seconds) },
       { className: 'leaderboard__date', value: (e) => formatDate(e.timestamp_utc) },
     ];
 
@@ -142,14 +160,19 @@ window.addEventListener('load', () => {
     }));
 
     leaderboardTable.hidden = entries.length === 0;
-    setLeaderboardMessage(entries.length === 0 ? 'No finished runs on this level yet.' : '');
+    const nothingYet = leaderboardCarKey
+      ? 'No finished runs in this car on this level yet.'
+      : 'No finished runs on this level yet.';
+    setLeaderboardMessage(entries.length === 0 ? nothingYet : '');
   };
 
   const loadLeaderboard = async () => {
     const requestId = ++leaderboardRequest;
     if (leaderboardTable.hidden) setLeaderboardMessage('Loading...');
 
-    const url = `${API_BASE_URL}/leaderboard?track=${encodeURIComponent(leaderboardLevel.track)}&limit=${LEADERBOARD_LIMIT}`;
+    const url = `${API_BASE_URL}/leaderboard?track=${encodeURIComponent(leaderboardLevel.track)}`
+      + `&sort=${leaderboardSortKey}&limit=${LEADERBOARD_LIMIT}`
+      + (leaderboardCarKey ? `&car=${encodeURIComponent(leaderboardCarKey)}` : '');
     try {
       const response = await fetch(url);
       if (!response.ok) throw new Error(`HTTP ${response.status}`);
@@ -187,24 +210,100 @@ window.addEventListener('load', () => {
     leaderboardLevelName.textContent = `Level ${twoDigits(leaderboardLevel.number)} - ${leaderboardLevel.name}`;
   };
 
-  const selectLeaderboardLevel = (level) => {
-    if (level === leaderboardLevel) return;
-    leaderboardLevel = level;
+  // Clear the table before a different level or board loads, so stale rows
+  // are never shown under the new heading.
+  const clearLeaderboard = () => {
     leaderboardTable.hidden = true;
     leaderboardBody.replaceChildren();
     leaderboardUpdated.textContent = '';
+  };
+
+  const selectLeaderboardLevel = (level) => {
+    if (level === leaderboardLevel) return;
+    leaderboardLevel = level;
+    clearLeaderboard();
     renderLeaderboardTabs();
     loadLeaderboard();
   };
 
-  const startLeaderboard = () => {
-    renderLeaderboardTabs();
+  // One sentence stating exactly what the table ranks, e.g. "Each driver's
+  // fastest finished run in the Toyota AE86 Tuned, Steam-verified only. ..."
+  const leaderboardRuleText = () => {
+    const sort = LEADERBOARD_SORTS[leaderboardSortKey];
+    const inCar = leaderboardCarKey ? ` in the ${carName(leaderboardCarKey)}` : '';
+    return `Each driver's ${sort.best} finished run${inCar}, Steam-verified only. ${sort.rule}`;
+  };
+
+  // Score / Time toggle: presses the chosen button, explains that board's
+  // rule, and marks the table so CSS can highlight the column it is ranked by.
+  const renderLeaderboardSort = () => {
+    leaderboardSort.querySelectorAll('.sort-toggle__option').forEach((button) => {
+      button.setAttribute('aria-pressed', button.dataset.sort === leaderboardSortKey ? 'true' : 'false');
+    });
+    leaderboardRule.textContent = leaderboardRuleText();
+    leaderboardTable.dataset.sort = leaderboardSortKey;
+  };
+
+  // Car filter: "All cars" plus every car from GET /cars, in the API's order.
+  const renderCarOptions = () => {
+    const all = document.createElement('option');
+    all.value = '';
+    all.textContent = 'All cars';
+    leaderboardCar.replaceChildren(all, ...[...carNames].map(([model, name]) => {
+      const option = document.createElement('option');
+      option.value = model;
+      option.textContent = name;
+      return option;
+    }));
+    leaderboardCar.value = leaderboardCarKey;
+  };
+
+  const loadCars = async () => {
+    if (carNames.size > 0) return;
+    try {
+      const response = await fetch(`${API_BASE_URL}/cars`);
+      if (!response.ok) throw new Error(`HTTP ${response.status}`);
+      const cars = await response.json();
+      carNames = new Map(cars.map((car) => [car.model, car.name]));
+      renderCarOptions();
+    } catch {
+      // Leave just "All cars"; the leaderboard itself reports when the API is offline.
+    }
+  };
+
+  leaderboardCar.addEventListener('change', () => {
+    leaderboardCarKey = leaderboardCar.value;
+    clearLeaderboard();
+    renderLeaderboardSort(); // the rule names the chosen car
     loadLeaderboard();
+  });
+
+  const selectLeaderboardSort = (key) => {
+    if (key === leaderboardSortKey || !(key in LEADERBOARD_SORTS)) return;
+    leaderboardSortKey = key;
+    clearLeaderboard();
+    renderLeaderboardSort();
+    loadLeaderboard();
+  };
+
+  leaderboardSort.addEventListener('click', (event) => {
+    const button = event.target.closest('.sort-toggle__option');
+    if (button) selectLeaderboardSort(button.dataset.sort);
+  });
+
+  const startLeaderboard = async () => {
+    renderLeaderboardTabs();
+    // Start the refresh timer before any awaiting, so stopLeaderboard can always
+    // find it if the player leaves the view while the car list is still loading.
     if (leaderboardTimer === null) {
       leaderboardTimer = window.setInterval(() => {
         if (!document.hidden) loadLeaderboard();
       }, LEADERBOARD_REFRESH_MS);
     }
+    setLeaderboardMessage('Loading...');
+    await loadCars(); // names first, so the first table already shows them
+    renderLeaderboardSort();
+    loadLeaderboard();
   };
 
   const stopLeaderboard = () => {

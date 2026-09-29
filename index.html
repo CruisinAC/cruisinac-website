@@ -143,20 +143,32 @@
         <div class="leaderboard">
           <div class="leaderboard__heading">
             <h3 id="leaderboardLevelName">Level</h3>
-            <p class="leaderboard__rule">
-              Each driver's best finished run, Steam-verified only. Highest score ranks first; a tied score goes to the faster time.
+            <div class="leaderboard__controls">
+              <label class="car-filter">
+                <span class="car-filter__label">Car</span>
+                <select class="car-filter__select" id="leaderboardCar">
+                  <option value="">All cars</option>
+                </select>
+              </label>
+              <div class="sort-toggle" id="leaderboardSort" role="group" aria-label="Rank drivers by">
+                <button type="button" class="sort-toggle__option" data-sort="score" aria-pressed="true">Score</button>
+                <button type="button" class="sort-toggle__option" data-sort="time" aria-pressed="false">Time</button>
+              </div>
+            </div>
+            <p class="leaderboard__rule" id="leaderboardRule">
+              Each driver's best-scoring finished run, Steam-verified only. Highest score ranks first; a tied score goes to the faster time.
             </p>
           </div>
           <p class="leaderboard__message" id="leaderboardMessage" role="status"></p>
           <div class="leaderboard__table-wrap">
-            <table class="leaderboard__table" id="leaderboardTable" hidden>
+            <table class="leaderboard__table" id="leaderboardTable" data-sort="score" hidden>
               <thead>
                 <tr>
                   <th scope="col">Rank</th>
                   <th scope="col">Driver</th>
                   <th class="leaderboard__car" scope="col">Car</th>
-                  <th class="num" scope="col">Score</th>
-                  <th class="num" scope="col">Time</th>
+                  <th class="num leaderboard__col-score" scope="col">Score</th>
+                  <th class="num leaderboard__col-time" scope="col">Time</th>
                   <th class="leaderboard__date" scope="col">Date</th>
                 </tr>
               </thead>

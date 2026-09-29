@@ -66,7 +66,7 @@ HTTP port. Existing level configs live in
 `momiji_line_outrun`, `batang_kali_outrun`, `pch_outrun`).
 
 ## Leaderboard
-The Leaderboard view (`#leaderboard`) reads `GET /leaderboard?track=<key>` from the results API,
+The Leaderboard view (`#leaderboard`) reads `GET /leaderboard?track=<key>&sort=score|time[&car=<model>]` from the results API,
 `C:\Users\mannr\Documents\GitHub\cruisinac-api\` (FastAPI + Postgres; game servers feed it via
 its `scripts/watch_jsonl.py`). Settings at the top of `script.js`:
 - `API_BASE_URL` - `http://localhost:8000`, the local API, for now. When the site is published
@@ -74,6 +74,14 @@ its `scripts/watch_jsonl.py`). Settings at the top of `script.js`:
   first, a cloud host if that falls short.
 - `LEVELS` - each level's number, name and track key. The key is `TRACK-CONFIG_TRACK` from that
   level server's `server_cfg.ini`, the same `Track` the plugin records.
+- `LEADERBOARD_SORTS` - the two boards behind the Score / Time toggle and the one-line rule
+  shown for each. Score: highest score, ties to the faster time. Time: fastest run, ties to
+  whoever set it first. A player's row can be a different run on each board. The ranked
+  column is highlighted via the table's `data-sort` attribute.
+- The car dropdown and the car names in the table come from the API's `GET /cars`
+  (`cars.json` there, model folder -> display name). Choosing a car adds `&car=` and
+  the rule sentence names the car. If `/cars` fails the dropdown keeps only "All cars"
+  and the table falls back to tidied folder names.
 
 Player names come from players, so they are only ever inserted with `textContent`, never as HTML.
 

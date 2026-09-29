@@ -723,8 +723,8 @@ dd {
   display: flex;
   flex-wrap: wrap;
   justify-content: space-between;
-  align-items: baseline;
-  gap: 8px 20px;
+  align-items: center;
+  gap: 10px 20px;
   margin-bottom: 14px;
 }
 
@@ -733,11 +733,96 @@ dd {
 }
 
 .leaderboard__rule {
+  flex-basis: 100%;
   max-width: 34rem;
   margin: 0;
   color: var(--muted);
   font-size: 0.98rem;
   line-height: 1.45;
+}
+
+.leaderboard__controls {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 10px 14px;
+}
+
+.car-filter {
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+}
+
+.car-filter__label {
+  color: var(--muted);
+  font: 700 0.72rem/1 'Orbitron', sans-serif;
+  letter-spacing: 0.16em;
+  text-transform: uppercase;
+}
+
+.car-filter__select {
+  max-width: 16rem;
+  padding: 9px 12px;
+  border-radius: 999px;
+  border: 1px solid rgba(255, 255, 255, 0.14);
+  background: rgba(255, 255, 255, 0.04);
+  color: var(--text);
+  font: 700 0.75rem/1 'Orbitron', sans-serif;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+  cursor: pointer;
+  transition: border-color 160ms ease;
+}
+
+.car-filter__select:hover {
+  border-color: rgba(68, 210, 255, 0.4);
+}
+
+.car-filter__select:focus-visible {
+  outline: 2px solid rgba(168, 241, 255, 0.9);
+  outline-offset: 2px;
+}
+
+.car-filter__select option {
+  background: #0f1426;
+  color: var(--text);
+}
+
+.sort-toggle {
+  display: inline-flex;
+  padding: 3px;
+  border-radius: 999px;
+  border: 1px solid rgba(255, 255, 255, 0.14);
+  background: rgba(255, 255, 255, 0.04);
+}
+
+.sort-toggle__option {
+  padding: 8px 18px;
+  border: 0;
+  border-radius: 999px;
+  background: transparent;
+  color: var(--muted);
+  font: 700 0.75rem/1 'Orbitron', sans-serif;
+  letter-spacing: 0.12em;
+  text-transform: uppercase;
+  cursor: pointer;
+  transition: background 160ms ease, color 160ms ease, box-shadow 160ms ease;
+}
+
+.sort-toggle__option:hover {
+  color: var(--text);
+}
+
+.sort-toggle__option:focus-visible {
+  outline: 2px solid rgba(168, 241, 255, 0.9);
+  outline-offset: 2px;
+}
+
+.sort-toggle__option[aria-pressed='true'] {
+  color: var(--text);
+  background: linear-gradient(90deg, rgba(68, 210, 255, 0.28), rgba(255, 79, 163, 0.24));
+  box-shadow: 0 0 18px rgba(68, 210, 255, 0.18);
 }
 
 .leaderboard__message {
@@ -802,7 +887,8 @@ dd {
   text-transform: uppercase;
 }
 
-.leaderboard__score {
+.leaderboard__table[data-sort='score'] .leaderboard__col-score,
+.leaderboard__table[data-sort='time'] .leaderboard__col-time {
   color: var(--blue);
   font-weight: 700;
 }
