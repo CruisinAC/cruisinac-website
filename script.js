@@ -1,9 +1,13 @@
 const VALID_VIEWS = ['start', 'level-select', 'leaderboard', 'credits'];
 const MUTE_KEY = 'cruisinAcMuted';
 
-// Where the results API (cruisinac-api) lives. The local API for now; change
-// this when the API is published.
-const API_BASE_URL = 'http://localhost:8000';
+// Where the results API (cruisinac-api) lives. The published API, reached through
+// its Cloudflare Tunnel, except when the site itself is being served locally
+// (python -m http.server), which talks to the local API as before.
+const LOCAL_HOSTS = ['localhost', '127.0.0.1'];
+const API_BASE_URL = LOCAL_HOSTS.includes(window.location.hostname)
+  ? 'http://localhost:8000'
+  : 'https://api.cruisin-ac.com';
 const LEADERBOARD_LIMIT = 50;
 const LEADERBOARD_REFRESH_MS = 30000;
 const SERVER_STATUS_REFRESH_MS = 15000;

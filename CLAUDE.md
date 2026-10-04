@@ -69,9 +69,10 @@ HTTP port. Existing level configs live in
 The Leaderboard view (`#leaderboard`) reads `GET /leaderboard?track=<key>&sort=score|time[&car=<model>]` from the results API,
 `C:\Users\mannr\Documents\GitHub\cruisinac-api\` (FastAPI + Postgres; game servers feed it via
 its `scripts/watch_jsonl.py`). Settings at the top of `script.js`:
-- `API_BASE_URL` - `http://localhost:8000`, the local API, for now. When the site is published
-  the API must be reachable from the internet: the plan is the home PC via Cloudflare Tunnel
-  first, a cloud host if that falls short.
+- `API_BASE_URL` - `https://api.cruisin-ac.com`, the API on the home PC through a Cloudflare
+  Tunnel. When the site is served from localhost it uses `http://localhost:8000` instead, so
+  the local test flow below still works. The site itself is published by Cloudflare Pages
+  from the `main` branch at `https://driftrun.cruisin-ac.com`.
 - `LEVELS` - each level's number, name and track key. The key is `TRACK-CONFIG_TRACK` from that
   level server's `server_cfg.ini`, the same `Track` the plugin records.
 - `LEADERBOARD_SORTS` - the two boards behind the Score / Time toggle and the one-line rule
