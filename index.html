@@ -181,7 +181,14 @@
               <tbody id="leaderboardBody"></tbody>
             </table>
           </div>
-          <p class="leaderboard__updated" id="leaderboardUpdated"></p>
+          <div class="leaderboard__footer">
+            <nav class="pager" id="leaderboardPager" aria-label="Leaderboard pages" hidden>
+              <button type="button" class="pager__button" id="leaderboardPrev" aria-label="Previous page">&lsaquo; Prev</button>
+              <span class="pager__status" id="leaderboardPageStatus" aria-live="polite"></span>
+              <button type="button" class="pager__button" id="leaderboardNext" aria-label="Next page">Next &rsaquo;</button>
+            </nav>
+            <p class="leaderboard__updated" id="leaderboardUpdated"></p>
+          </div>
         </div>
       </section>
     </main>

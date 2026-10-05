@@ -8,7 +8,7 @@ const LOCAL_HOSTS = ['localhost', '127.0.0.1'];
 const API_BASE_URL = LOCAL_HOSTS.includes(window.location.hostname)
   ? 'http://localhost:8000'
   : 'https://api.cruisin-ac.com';
-const LEADERBOARD_LIMIT = 50;
+const LEADERBOARD_PAGE_SIZE = 25;
 const LEADERBOARD_REFRESH_MS = 30000;
 const SERVER_STATUS_REFRESH_MS = 15000;
 
@@ -51,6 +51,10 @@ window.addEventListener('load', () => {
   const leaderboardTable = document.getElementById('leaderboardTable');
   const leaderboardBody = document.getElementById('leaderboardBody');
   const leaderboardUpdated = document.getElementById('leaderboardUpdated');
+  const leaderboardPager = document.getElementById('leaderboardPager');
+  const leaderboardPrev = document.getElementById('leaderboardPrev');
+  const leaderboardNext = document.getElementById('leaderboardNext');
+  const leaderboardPageStatus = document.getElementById('leaderboardPageStatus');
 
   let dismissed = false;
   let justCompletedIntro = false;
@@ -110,6 +114,7 @@ window.addEventListener('load', () => {
   let leaderboardLevel = LEVELS.find((l) => l.number === DEFAULT_LEADERBOARD_LEVEL) || LEVELS[0];
   let leaderboardSortKey = DEFAULT_LEADERBOARD_SORT;
   let leaderboardCarKey = ''; // a car's model folder, or '' for all cars
+  let leaderboardPage = 1; // 1-based; back to 1 whenever the level, board or car changes
   let carNames = new Map(); // model folder -> display name, from GET /cars
   let leaderboardTimer = null;
   let leaderboardRequest = 0;
@@ -139,6 +144,15 @@ window.addEventListener('load', () => {
   const setLeaderboardMessage = (text) => {
     leaderboardMessage.textContent = text;
     leaderboardMessage.hidden = !text;
+  };
+
+  // "Page 2 of 7 · 164 drivers". Hidden while the board fits on one page.
+  const renderPager = (page) => {
+    const drivers = `${page.total} ${page.total === 1 ? 'driver' : 'drivers'}`;
+    leaderboardPageStatus.textContent = `Page ${page.page} of ${page.pages} · ${drivers}`;
+    leaderboardPrev.disabled = page.page <= 1;
+    leaderboardNext.disabled = page.page >= page.pages;
+    leaderboardPager.hidden = page.pages <= 1;
   };
 
   const renderLeaderboard = (entries) => {
@@ -175,18 +189,31 @@ window.addEventListener('load', () => {
     if (leaderboardTable.hidden) setLeaderboardMessage('Loading...');
 
     const url = `${API_BASE_URL}/leaderboard?track=${encodeURIComponent(leaderboardLevel.track)}`
-      + `&sort=${leaderboardSortKey}&limit=${LEADERBOARD_LIMIT}`
+      + `&sort=${leaderboardSortKey}&page=${leaderboardPage}&page_size=${LEADERBOARD_PAGE_SIZE}`
       + (leaderboardCarKey ? `&car=${encodeURIComponent(leaderboardCarKey)}` : '');
     try {
       const response = await fetch(url);
       if (!response.ok) throw new Error(`HTTP ${response.status}`);
-      const entries = await response.json();
+      const body = await response.json();
       if (requestId !== leaderboardRequest) return; // a newer request replaced this one
-      renderLeaderboard(entries);
+      // The API answers {entries, total, page, page_size, pages}. A plain list (the shape
+      // before paging) is still accepted so the site and API can be updated separately.
+      const page = Array.isArray(body)
+        ? { entries: body, total: body.length, page: 1, page_size: body.length, pages: 1 }
+        : body;
+      if (page.entries.length === 0 && page.page > page.pages) {
+        // The board shrank under us (fewer drivers than when the page was chosen): show the last page.
+        leaderboardPage = page.pages;
+        loadLeaderboard();
+        return;
+      }
+      renderLeaderboard(page.entries);
+      renderPager(page);
       leaderboardUpdated.textContent = `Updated ${new Date().toLocaleTimeString()}`;
     } catch {
       if (requestId !== leaderboardRequest) return;
       leaderboardTable.hidden = true;
+      leaderboardPager.hidden = true;
       setLeaderboardMessage('Leaderboard offline. Could not reach the results server.');
       leaderboardUpdated.textContent = '';
     }
@@ -218,9 +245,22 @@ window.addEventListener('load', () => {
   // are never shown under the new heading.
   const clearLeaderboard = () => {
     leaderboardTable.hidden = true;
+    leaderboardPager.hidden = true;
     leaderboardBody.replaceChildren();
     leaderboardUpdated.textContent = '';
+    leaderboardPage = 1;
   };
+
+  const goToLeaderboardPage = (page) => {
+    leaderboardPage = Math.max(1, page);
+    leaderboardTable.hidden = true;
+    leaderboardBody.replaceChildren();
+    setLeaderboardMessage('Loading...');
+    loadLeaderboard();
+  };
+
+  leaderboardPrev.addEventListener('click', () => goToLeaderboardPage(leaderboardPage - 1));
+  leaderboardNext.addEventListener('click', () => goToLeaderboardPage(leaderboardPage + 1));
 
   const selectLeaderboardLevel = (level) => {
     if (level === leaderboardLevel) return;

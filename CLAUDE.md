@@ -66,7 +66,7 @@ HTTP port. Existing level configs live in
 `momiji_line_outrun`, `batang_kali_outrun`, `pch_outrun`).
 
 ## Leaderboard
-The Leaderboard view (`#leaderboard`) reads `GET /leaderboard?track=<key>&sort=score|time[&car=<model>]` from the results API,
+The Leaderboard view (`#leaderboard`) reads `GET /leaderboard?track=<key>&sort=score|time&page=<n>&page_size=25[&car=<model>]` from the results API,
 `C:\Users\mannr\Documents\GitHub\cruisinac-api\` (FastAPI + Postgres; game servers feed it via
 its `scripts/watch_jsonl.py`). Settings at the top of `script.js`:
 - `API_BASE_URL` - `https://api.cruisin-ac.com`, the API on the home PC through a Cloudflare
@@ -83,6 +83,11 @@ its `scripts/watch_jsonl.py`). Settings at the top of `script.js`:
   (`cars.json` there, model folder -> display name). Choosing a car adds `&car=` and
   the rule sentence names the car. If `/cars` fails the dropdown keeps only "All cars"
   and the table falls back to tidied folder names.
+- `LEADERBOARD_PAGE_SIZE` (25) - the API answers one page at a time as
+  `{entries, total, page, page_size, pages}`; Prev / Next under the table and
+  "Page 2 of 7 · 164 drivers" come from that. The pager is hidden when everything fits on
+  one page. Changing level, board or car goes back to page 1; the 30 s refresh keeps the page.
+  A plain list response (the pre-paging shape) is still accepted during a switchover.
 
 Player names come from players, so they are only ever inserted with `textContent`, never as HTML.
 

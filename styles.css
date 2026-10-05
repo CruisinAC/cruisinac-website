@@ -909,11 +909,62 @@ dd {
   color: var(--muted);
 }
 
+.leaderboard__footer {
+  display: flex;
+  flex-wrap: wrap;
+  justify-content: space-between;
+  align-items: center;
+  gap: 10px 16px;
+  margin-top: 12px;
+}
+
 .leaderboard__updated {
-  margin: 12px 0 0;
+  margin: 0 0 0 auto;
   color: var(--muted);
   font-size: 0.85rem;
   text-align: right;
+}
+
+/* Page forward / back under the table, styled like the Score / Time toggle. */
+.pager {
+  display: inline-flex;
+  align-items: center;
+  gap: 12px;
+}
+
+.pager__button {
+  padding: 8px 14px;
+  border-radius: 999px;
+  border: 1px solid rgba(255, 255, 255, 0.14);
+  background: rgba(255, 255, 255, 0.04);
+  color: var(--text);
+  font: 700 0.75rem/1 'Orbitron', sans-serif;
+  letter-spacing: 0.12em;
+  text-transform: uppercase;
+  cursor: pointer;
+  transition: border-color 160ms ease, color 160ms ease;
+}
+
+.pager__button:hover:not(:disabled) {
+  border-color: rgba(68, 210, 255, 0.4);
+}
+
+.pager__button:focus-visible {
+  outline: 2px solid rgba(168, 241, 255, 0.9);
+  outline-offset: 2px;
+}
+
+.pager__button:disabled {
+  color: rgba(233, 238, 255, 0.35);
+  cursor: default;
+}
+
+.pager__status {
+  color: var(--muted);
+  font: 700 0.72rem/1 'Orbitron', sans-serif;
+  letter-spacing: 0.12em;
+  text-transform: uppercase;
+  font-variant-numeric: tabular-nums;
 }
 
 .intro {
