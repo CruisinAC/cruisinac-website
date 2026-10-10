@@ -61,12 +61,15 @@ window.addEventListener('load', () => {
   let startGateStamped = false;
   let startGateMenuShown = false;
 
+  // Music is switched off for now while the opening sequence is reworked so a
+  // player input starts it. Every play path goes through here; restore the body
+  // below to turn it back on.
   const tryPlayBgMusic = () => {
-    if (!bgMusic) return;
-    try {
-      const p = bgMusic.play();
-      if (p && typeof p.catch === 'function') p.catch(() => {});
-    } catch { /* ignore */ }
+    // if (!bgMusic) return;
+    // try {
+    //   const p = bgMusic.play();
+    //   if (p && typeof p.catch === 'function') p.catch(() => {});
+    // } catch { /* ignore */ }
   };
 
   const isMuted = () => window.sessionStorage.getItem(MUTE_KEY) === '1';
