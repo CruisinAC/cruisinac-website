@@ -1,5 +1,30 @@
-const VALID_VIEWS = ['start', 'level-select', 'leaderboard', 'credits'];
+const VALID_VIEWS = [
+  'start', 'level-select', 'leaderboard', 'credits',
+  'options', 'about', 'how-to-play', 'controls', 'rules', 'downloads',
+];
+// Where Back / Esc goes from each view: one level up the menus.
+const VIEW_PARENT = {
+  'level-select': 'start',
+  leaderboard: 'start',
+  credits: 'start',
+  options: 'start',
+  about: 'options',
+  'how-to-play': 'options',
+  controls: 'options',
+  rules: 'options',
+  downloads: 'options',
+};
 const MUTE_KEY = 'cruisinAcMuted';
+// Volume sliders in the Sound panel run 0-100. Loudness is the square of the slider
+// position (25 -> 0.06), which feels even across the range, unlike a straight line.
+// The player's choice is remembered in this browser (VOLUME_KEY).
+const VOLUME_KEY = 'cruisinAcVolume';
+const DEFAULT_MUSIC_LEVEL = 25;
+const DEFAULT_SFX_LEVEL = 60;
+const MUSIC_FADE_MS = 1000; // the music fades in from silence over this long
+// The track is silent for its first 2.75 s (measured; music is audible from ~2.9 s), so
+// playback, and every loop, starts here instead of at 0.
+const MUSIC_START_SECONDS = 2.7;
 
 // Where the results API (cruisinac-api) lives. The published API, reached through
 // its Cloudflare Tunnel, except when the site itself is being served locally
@@ -38,9 +63,14 @@ window.addEventListener('load', () => {
   const bgMusic = document.getElementById('bgMusic');
   const muteToggle = document.getElementById('muteToggle');
   const muteIcon = muteToggle ? muteToggle.querySelector('.mute-toggle__icon') : null;
+  const soundPanel = document.getElementById('soundPanel');
+  const musicSlider = document.getElementById('musicVolume');
+  const musicSliderValue = document.getElementById('musicVolumeValue');
+  const sfxSlider = document.getElementById('sfxVolume');
+  const sfxSliderValue = document.getElementById('sfxVolumeValue');
+  const muteAllButton = document.getElementById('soundMute');
   const views = document.querySelectorAll('.view');
   const startGate = document.getElementById('startGate');
-  const startGatePrompt = document.getElementById('startGatePrompt');
   const levelCards = document.querySelectorAll('.level-card');
   const leaderboardTabs = document.getElementById('leaderboardTabs');
   const leaderboardLevelName = document.getElementById('leaderboardLevelName');
@@ -60,38 +90,182 @@ window.addEventListener('load', () => {
   let justCompletedIntro = false;
   let startGateStamped = false;
   let startGateMenuShown = false;
+  let entered = false; // the first press on the landing screen has happened
+  let musicStarted = false;
 
-  // Music is switched off for now while the opening sequence is reworked so a
-  // player input starts it. Every play path goes through here; restore the body
-  // below to turn it back on.
+  // ---- Volume (the Sound panel behind the speaker button) ----
+
+  const loadLevels = () => {
+    try {
+      const saved = JSON.parse(window.localStorage.getItem(VOLUME_KEY) || '{}');
+      const level = (value, fallback) => (Number.isFinite(value) ? Math.min(100, Math.max(0, value)) : fallback);
+      return { music: level(saved.music, DEFAULT_MUSIC_LEVEL), sfx: level(saved.sfx, DEFAULT_SFX_LEVEL) };
+    } catch {
+      return { music: DEFAULT_MUSIC_LEVEL, sfx: DEFAULT_SFX_LEVEL };
+    }
+  };
+
+  const levels = loadLevels();
+  let musicFading = false;
+  const loudness = (level) => (level / 100) ** 2;
+  const musicVolume = () => loudness(levels.music);
+
+  const saveLevels = () => {
+    try { window.localStorage.setItem(VOLUME_KEY, JSON.stringify(levels)); } catch { /* not saved */ }
+  };
+
+  Sfx.setVolume(loudness(levels.sfx));
+
+  // Loop by hand rather than with the `loop` attribute, so each repeat also skips the
+  // silent lead-in.
+  if (bgMusic) {
+    bgMusic.loop = false;
+    bgMusic.addEventListener('ended', () => {
+      bgMusic.currentTime = MUSIC_START_SECONDS;
+      tryPlayBgMusic();
+    });
+  }
+
+  // Every play path goes through here. Nothing plays before startMusic (the first press).
   const tryPlayBgMusic = () => {
-    // if (!bgMusic) return;
-    // try {
-    //   const p = bgMusic.play();
-    //   if (p && typeof p.catch === 'function') p.catch(() => {});
-    // } catch { /* ignore */ }
+    if (!bgMusic || !musicStarted) return;
+    try {
+      const p = bgMusic.play();
+      if (p && typeof p.catch === 'function') p.catch(() => {});
+    } catch { /* ignore */ }
+  };
+
+  // The music starts when the Initial DriftRun logo stamps in (handleStartView), not on the
+  // Enter press, so the Cruisin AC intro has room for its own sounds. Browsers only let
+  // music start from a click or key press, so the Enter press primes it: plays it silently
+  // and pauses at once, which counts as permission for the later, press-less start.
+  const primeMusic = () => {
+    if (!bgMusic || musicStarted) return;
+    bgMusic.muted = true;
+    try {
+      const p = bgMusic.play();
+      const settle = () => {
+        if (musicStarted) return; // the real start already happened (fast presses)
+        bgMusic.pause();
+        bgMusic.currentTime = 0;
+      };
+      const restoreMute = () => { bgMusic.muted = isMuted(); };
+      if (p && typeof p.then === 'function') {
+        p.then(settle, () => {}).finally(restoreMute);
+      } else {
+        settle();
+        restoreMute();
+      }
+    } catch {
+      bgMusic.muted = isMuted();
+    }
+  };
+
+  // Fades in from silence to the Music slider's volume.
+  const startMusic = () => {
+    if (!bgMusic || musicStarted) return;
+    musicStarted = true;
+    bgMusic.volume = 0;
+    bgMusic.muted = isMuted();
+    // Jumping into the file only works once the browser knows its length (metadata).
+    if (bgMusic.readyState >= 1) bgMusic.currentTime = MUSIC_START_SECONDS;
+    else bgMusic.addEventListener('loadedmetadata', () => { bgMusic.currentTime = MUSIC_START_SECONDS; }, { once: true });
+    tryPlayBgMusic();
+    // Not the active window right now (switched away during the intro): wait for focus.
+    if (document.hidden || !document.hasFocus()) bgMusic.pause();
+    const began = performance.now();
+    musicFading = true;
+    const fade = window.setInterval(() => {
+      const t = Math.min(1, (performance.now() - began) / MUSIC_FADE_MS);
+      bgMusic.volume = musicVolume() * t; // follows the slider if it moves mid-fade
+      if (t >= 1) {
+        window.clearInterval(fade);
+        musicFading = false;
+      }
+    }, 50);
   };
 
   const isMuted = () => window.sessionStorage.getItem(MUTE_KEY) === '1';
 
   const applyMuteState = (muted) => {
     if (bgMusic) bgMusic.muted = muted;
-    if (muteToggle) {
-      muteToggle.classList.toggle('is-muted', muted);
-      muteToggle.setAttribute('aria-pressed', muted ? 'true' : 'false');
-      muteToggle.setAttribute('aria-label', muted ? 'Unmute music' : 'Mute music');
-    }
+    if (muteToggle) muteToggle.classList.toggle('is-muted', muted);
     if (muteIcon) muteIcon.textContent = muted ? '🔇' : '🔊';
+    if (muteAllButton) {
+      muteAllButton.setAttribute('aria-pressed', muted ? 'true' : 'false');
+      muteAllButton.textContent = muted ? 'Sound off' : 'Mute all';
+    }
+    if (soundPanel) soundPanel.classList.toggle('is-muted', muted);
   };
 
   applyMuteState(isMuted());
 
+  const showLevel = (slider, output, level) => {
+    if (slider) slider.value = String(level);
+    if (output) output.textContent = String(level);
+  };
+  showLevel(musicSlider, musicSliderValue, levels.music);
+  showLevel(sfxSlider, sfxSliderValue, levels.sfx);
+
+  const setSoundPanelOpen = (open) => {
+    if (!soundPanel || !muteToggle) return;
+    soundPanel.hidden = !open;
+    muteToggle.setAttribute('aria-expanded', open ? 'true' : 'false');
+  };
+  const soundPanelOpen = () => Boolean(soundPanel && !soundPanel.hidden);
+
   if (muteToggle) {
     muteToggle.addEventListener('click', () => {
+      setSoundPanelOpen(!soundPanelOpen());
+      Sfx.tick();
+    });
+  }
+
+  // Close the panel on a click elsewhere or Esc (Esc then does not also leave the page).
+  document.addEventListener('pointerdown', (event) => {
+    if (soundPanelOpen() && !event.target.closest('#soundPanel, #muteToggle')) setSoundPanelOpen(false);
+  });
+  window.addEventListener('keydown', (event) => {
+    if (event.key !== 'Escape' || !soundPanelOpen()) return;
+    event.preventDefault();
+    setSoundPanelOpen(false);
+    if (muteToggle) muteToggle.focus();
+  });
+
+  if (musicSlider) {
+    musicSlider.addEventListener('input', () => {
+      levels.music = Number(musicSlider.value);
+      showLevel(null, musicSliderValue, levels.music);
+      if (bgMusic && !musicFading) bgMusic.volume = musicVolume();
+      saveLevels();
+    });
+  }
+
+  // The effects slider plays a tick as it moves, at the new volume, so you hear the level.
+  let lastSliderTick = 0;
+  if (sfxSlider) {
+    sfxSlider.addEventListener('input', () => {
+      levels.sfx = Number(sfxSlider.value);
+      showLevel(null, sfxSliderValue, levels.sfx);
+      Sfx.setVolume(loudness(levels.sfx));
+      saveLevels();
+      const now = performance.now();
+      if (now - lastSliderTick > 90) {
+        lastSliderTick = now;
+        Sfx.move(1);
+      }
+    });
+  }
+
+  if (muteAllButton) {
+    muteAllButton.addEventListener('click', () => {
       const next = !isMuted();
       window.sessionStorage.setItem(MUTE_KEY, next ? '1' : '0');
       applyMuteState(next);
-      if (!next) tryPlayBgMusic();
+      if (!next) {
+        tryPlayBgMusic();
+        Sfx.tick();
+      }
     });
   }
 
@@ -101,11 +275,11 @@ window.addEventListener('load', () => {
 
     if (justCompletedIntro && !startGateStamped) {
       startGateStamped = true;
-      window.setTimeout(() => startGate.classList.add('start-gate--stamp'), 80);
       window.setTimeout(() => {
-        startGate.classList.add('start-gate--ready');
-        if (startGatePrompt) startGatePrompt.classList.add('is-visible');
-      }, 1220);
+        startGate.classList.add('start-gate--stamp');
+        startMusic(); // the music arrives with the logo
+      }, 80);
+      window.setTimeout(revealStartMenu, 1220); // the menu follows once the logo has landed
     } else {
       startGate.classList.add('start-gate--instant', 'start-gate--menu');
       startGateMenuShown = true;
@@ -368,10 +542,18 @@ window.addEventListener('load', () => {
   const cardLevel = (card) => Number.parseInt(card.querySelector('.level-card__rank').textContent, 10);
 
   // Online cards link to Content Manager; offline ones have no href, so they cannot be clicked.
-  const setCardStatus = (card, state, text, server) => {
+  // `count` ("3/8") is shown after the text in the number font: "Online · 3/8".
+  const setCardStatus = (card, state, text, server, count = '') => {
     const badge = card.querySelector('.status');
     badge.className = `status status--${state}`;
-    badge.textContent = text;
+    if (count) {
+      const number = document.createElement('span');
+      number.className = 'status__count';
+      number.textContent = count;
+      badge.replaceChildren(`${text} · `, number);
+    } else {
+      badge.textContent = text;
+    }
 
     const online = state === 'live';
     const label = `Level ${cardLevel(card)} ${card.querySelector('h3').textContent}`;
@@ -402,8 +584,8 @@ window.addEventListener('load', () => {
       levelCards.forEach((card) => {
         const server = byLevel.get(cardLevel(card));
         if (server && server.online) {
-          const drivers = server.max_clients ? ` · ${server.clients}/${server.max_clients}` : '';
-          setCardStatus(card, 'live', `Online${drivers}`, server);
+          const drivers = server.max_clients ? `${server.clients}/${server.max_clients}` : '';
+          setCardStatus(card, 'live', 'Online', server, drivers);
         } else {
           setCardStatus(card, 'offline', 'Offline');
         }
@@ -429,8 +611,224 @@ window.addEventListener('load', () => {
     serverStatusTimer = null;
   };
 
+  // ---- Full screen ----
+  // The browser's Fullscreen API. It only works from a click or key press, which the
+  // button is. Esc (or F11) also leaves full screen; the button follows either way.
+  // Hidden where the browser cannot do it (e.g. iPhone Safari, which only allows video).
+
+  const fullscreenToggle = document.getElementById('fullscreenToggle');
+  const root = document.documentElement;
+  const canFullscreen = Boolean(root.requestFullscreen || root.webkitRequestFullscreen)
+    && document.fullscreenEnabled !== false;
+  const fullscreenElement = () => document.fullscreenElement || document.webkitFullscreenElement || null;
+
+  const toggleFullscreen = () => {
+    try {
+      if (fullscreenElement()) {
+        (document.exitFullscreen || document.webkitExitFullscreen).call(document);
+      } else {
+        const request = root.requestFullscreen || root.webkitRequestFullscreen;
+        const result = request.call(root, { navigationUI: 'hide' });
+        if (result && typeof result.catch === 'function') result.catch(() => {});
+      }
+    } catch { /* the browser refused; nothing to do */ }
+  };
+
+  const syncFullscreenButton = () => {
+    const on = Boolean(fullscreenElement());
+    fullscreenToggle.classList.toggle('is-fullscreen', on);
+    fullscreenToggle.setAttribute('aria-label', on ? 'Exit full screen' : 'Full screen');
+    fullscreenToggle.title = on ? 'Exit full screen' : 'Full screen';
+  };
+
+  if (fullscreenToggle && canFullscreen) {
+    fullscreenToggle.hidden = false;
+    syncFullscreenButton();
+    fullscreenToggle.addEventListener('click', () => {
+      Sfx.tick();
+      toggleFullscreen();
+    });
+    document.addEventListener('fullscreenchange', syncFullscreenButton);
+    document.addEventListener('webkitfullscreenchange', syncFullscreenButton);
+  }
+
+  // ---- Menu cursor and sounds ----
+  // Arcade-style menus: Up/Down moves a highlighted cursor (the mouse moves it too),
+  // Enter confirms, Esc/Backspace goes back. The highlighted item is also the focused one,
+  // so Tab and screen readers stay in step with it.
+
+  const startMenuItems = startGate ? [...startGate.querySelectorAll('.start-menu__item')] : [];
+  const optionsMenu = document.getElementById('optionsMenu');
+  const optionsMenuItems = optionsMenu ? [...optionsMenu.querySelectorAll('.start-menu__item')] : [];
+  const keyLegend = document.getElementById('keyLegend');
+  let currentView = null;
+  let selected = null;
+
+  // Disabled menu items and offline level cards can still be highlighted (and buzz when chosen).
+  startMenuItems.forEach((item) => { if (!item.hasAttribute('href')) item.tabIndex = -1; });
+  levelCards.forEach((card) => { card.tabIndex = 0; });
+
+  const isUnavailable = (item) => item.getAttribute('aria-disabled') === 'true' || !item.hasAttribute('href');
+
+  const navItems = () => {
+    if (currentView === 'start') return startGateMenuShown ? startMenuItems : [];
+    if (currentView === 'options') return optionsMenuItems;
+    if (currentView === 'level-select') return [...levelCards];
+    return [];
+  };
+
+  const clearSelection = () => {
+    if (selected) selected.classList.remove('is-selected');
+    selected = null;
+  };
+
+  const select = (item, { sound = true, direction = 1 } = {}) => {
+    if (!item || item === selected) return;
+    clearSelection();
+    selected = item;
+    item.classList.add('is-selected');
+    if (document.activeElement !== item) item.focus({ preventScroll: true });
+    item.scrollIntoView({ block: 'nearest', behavior: 'smooth' });
+    if (sound) Sfx.move(direction);
+  };
+
+  const flash = (item, className, ms) => {
+    item.classList.remove(className);
+    void item.offsetWidth; // restart the animation on repeated presses
+    item.classList.add(className);
+    window.setTimeout(() => item.classList.remove(className), ms);
+  };
+
+  const deny = (item) => {
+    Sfx.denied();
+    if (item) flash(item, 'is-denied', 320);
+  };
+
+  const moveCursor = (direction) => {
+    const items = navItems();
+    if (items.length === 0) return;
+    const index = items.indexOf(selected);
+    const next = index === -1
+      ? items[direction > 0 ? 0 : items.length - 1]
+      : items[(index + direction + items.length) % items.length];
+    select(next, { direction });
+  };
+
+  // Mouse hover moves the cursor (not touch: a tap would blip and confirm at once).
+  [...startMenuItems, ...optionsMenuItems, ...levelCards].forEach((item) => {
+    item.addEventListener('pointerenter', (event) => {
+      if (event.pointerType === 'mouse') select(item);
+    });
+    item.addEventListener('focus', () => select(item)); // Tab key
+  });
+
+  // Every view link: confirm going in, the "back" sound going up a level.
+  document.querySelectorAll('[data-view-link]').forEach((link) => {
+    link.addEventListener('click', () => {
+      if (link.dataset.viewLink === VIEW_PARENT[currentView]) Sfx.back();
+      else Sfx.select();
+    });
+  });
+
+  startMenuItems.filter((item) => !item.hasAttribute('href')).forEach((item) => {
+    item.addEventListener('click', () => deny(item));
+  });
+
+  // Online cards hand off to Content Manager. Offline cards cannot be joined.
+  levelCards.forEach((card) => {
+    card.addEventListener('click', () => {
+      if (isUnavailable(card)) {
+        deny(card);
+      } else {
+        Sfx.select();
+        flash(card, 'is-launching', 900);
+      }
+    });
+  });
+
+  document.querySelectorAll('.credit-card').forEach((card) => card.addEventListener('click', () => Sfx.select()));
+
+  // Leaderboard controls (the tabs are rebuilt on every render, so listen on their container).
+  leaderboardTabs.addEventListener('click', (event) => { if (event.target.closest('.leaderboard-tab')) Sfx.tick(); });
+  leaderboardSort.addEventListener('click', (event) => { if (event.target.closest('.sort-toggle__option')) Sfx.tick(); });
+  leaderboardCar.addEventListener('change', () => Sfx.tick());
+  [leaderboardPrev, leaderboardNext].forEach((button) => button.addEventListener('click', () => Sfx.tick()));
+
+  const stepLeaderboardLevel = (direction) => {
+    const index = LEVELS.indexOf(leaderboardLevel);
+    const next = LEVELS[(index + direction + LEVELS.length) % LEVELS.length];
+    Sfx.move(direction);
+    selectLeaderboardLevel(next);
+  };
+
+  // The key hints along the bottom of the screen, per view (hidden on touch screens).
+  const KEY_LEGENDS = {
+    start: [['\u2191\u2193', 'Select'], ['Enter', 'Confirm']],
+    'level-select': [['\u2191\u2193', 'Select'], ['Enter', 'Join'], ['Esc', 'Back']],
+    leaderboard: [['\u2190\u2192', 'Level'], ['Esc', 'Back']],
+    credits: [['Esc', 'Back']],
+    options: [['\u2191\u2193', 'Select'], ['Enter', 'Confirm'], ['Esc', 'Back']],
+    about: [['Esc', 'Back']],
+    'how-to-play': [['Esc', 'Back']],
+    controls: [['Esc', 'Back']],
+    rules: [['Esc', 'Back']],
+    downloads: [['Esc', 'Back']],
+  };
+
+  const renderKeyLegend = () => {
+    if (!keyLegend) return;
+    const show = currentView && !(currentView === 'start' && !startGateMenuShown);
+    keyLegend.hidden = !show;
+    if (!show) return;
+    keyLegend.replaceChildren(...KEY_LEGENDS[currentView].map(([key, action]) => {
+      const hint = document.createElement('span');
+      hint.className = 'key-legend__hint';
+      const cap = document.createElement('kbd');
+      cap.textContent = key;
+      hint.append(cap, action);
+      return hint;
+    }));
+  };
+
+  window.addEventListener('keydown', (event) => {
+    if (!dismissed || event.defaultPrevented) return;
+    if (event.altKey || event.ctrlKey || event.metaKey) return;
+    if (event.target.closest && event.target.closest('select, input, textarea, #soundPanel')) return;
+    if (event.key === 'Enter' && event.target.closest && event.target.closest('#muteToggle, #fullscreenToggle')) return;
+
+    if (event.key === 'Escape' || event.key === 'Backspace') {
+      if (currentView && currentView !== 'start') {
+        event.preventDefault();
+        Sfx.back();
+        goToView(VIEW_PARENT[currentView] || 'start');
+      }
+      return;
+    }
+
+    if (event.key === 'ArrowDown' || event.key === 'ArrowUp') {
+      if (navItems().length === 0) return;
+      event.preventDefault();
+      moveCursor(event.key === 'ArrowDown' ? 1 : -1);
+      return;
+    }
+
+    if (currentView === 'leaderboard' && (event.key === 'ArrowLeft' || event.key === 'ArrowRight')) {
+      event.preventDefault();
+      stepLeaderboardLevel(event.key === 'ArrowRight' ? 1 : -1);
+      return;
+    }
+
+    if (event.key === 'Enter' && selected && navItems().includes(selected)) {
+      event.preventDefault();
+      selected.click(); // the click handlers above play the sound and do the rest
+    }
+  });
+
   const showView = (name) => {
     const target = VALID_VIEWS.includes(name) ? name : 'start';
+    const previousView = currentView;
+    currentView = target;
+    clearSelection();
     views.forEach((v) => {
       v.hidden = v.dataset.view !== target;
     });
@@ -439,13 +837,38 @@ window.addEventListener('load', () => {
     else stopLeaderboard();
     if (target === 'level-select') startServerStatus();
     else stopServerStatus();
+    // Back on a menu: the cursor returns to the item you came out of.
+    const menu = target === 'start' && startGateMenuShown ? startMenuItems
+      : target === 'options' ? optionsMenuItems
+        : null;
+    if (menu && menu.length > 0) {
+      const cameFrom = menu.find((item) => item.dataset.viewLink === previousView);
+      select(cameFrom || menu[0], { sound: false });
+    }
+    renderKeyLegend();
   };
 
   const revealStartMenu = () => {
     if (!startGate || startGateMenuShown) return;
     startGateMenuShown = true;
     startGate.classList.add('start-gate--menu');
+    select(startMenuItems[0], { sound: false });
+    renderKeyLegend();
   };
+
+  // Enter or a click while the logo is still stamping in skips straight to the menu.
+  const skipToMenu = () => {
+    if (!startGate || startGateMenuShown) return;
+    Sfx.select();
+    startGate.classList.add('start-gate--instant');
+    revealStartMenu();
+  };
+
+  if (startGate) {
+    startGate.addEventListener('click', () => {
+      if (dismissed && !startGateMenuShown) skipToMenu();
+    });
+  }
 
   const goToView = (name) => {
     const target = VALID_VIEWS.includes(name) ? name : 'start';
@@ -462,6 +885,11 @@ window.addEventListener('load', () => {
       event.preventDefault();
       goToView(link.dataset.viewLink);
     });
+  });
+
+  // The first click, tap or key press anywhere unlocks sound (see sfx.js).
+  ['pointerdown', 'keydown', 'touchend'].forEach((type) => {
+    window.addEventListener(type, () => Sfx.unlock(), true);
   });
 
   window.addEventListener('hashchange', () => {
@@ -502,61 +930,73 @@ window.addEventListener('load', () => {
     showView(initialHash);
     if (!isMuted()) tryPlayBgMusic();
   } else {
-    window.addEventListener('keydown', (event) => {
-      if (event.key !== 'Enter') return;
-      if (!dismissed) {
-        event.preventDefault();
+    // Landing screen: PRESS ENTER TO START flashes until the first press (Enter, click or
+    // tap). That press starts the music and the Cruisin AC "Presents" animation. A second
+    // press, or the animation finishing, moves on to the Initial DriftRun logo.
+    const enter = () => {
+      if (entered || !intro) return;
+      entered = true;
+      Sfx.coin();
+      primeMusic();
+      intro.classList.add('intro--pressed'); // the prompt strobes, like a cabinet taking a credit
+      window.setTimeout(() => {
+        intro.classList.add('intro--started');
+        window.setTimeout(() => setPhase('sun'), 80);
+        window.setTimeout(() => setPhase('ac'), 1850);
+        window.setTimeout(() => setPhase('cruisin'), 3000);
+        window.setTimeout(() => {
+          if (dismissed) return;
+          intro.classList.add('intro--ready');
+          window.setTimeout(() => dismissIntro(), 2000);
+        }, 4300);
+      }, 450);
+    };
+
+    const pressOnIntro = () => {
+      if (!entered) {
+        enter();
+      } else if (!dismissed) {
+        Sfx.select();
         dismissIntro();
       }
-    });
+    };
 
-    window.setTimeout(() => setPhase('sun'), 80);
-    window.setTimeout(() => setPhase('ac'), 1850);
-    window.setTimeout(() => setPhase('cruisin'), 3000);
-    window.setTimeout(() => tryPlayBgMusic(), 4300);
-    window.setTimeout(() => {
-      if (dismissed || !intro) return;
-      intro.classList.add('intro--ready');
-      window.setTimeout(() => dismissIntro(), 2000);
-    }, 4300);
+    window.addEventListener('keydown', (event) => {
+      if (event.key !== 'Enter' || event.repeat || dismissed) return;
+      event.preventDefault();
+      pressOnIntro();
+    });
+    if (intro) intro.addEventListener('pointerdown', pressOnIntro);
   }
 
   window.addEventListener('keydown', (event) => {
-    if (event.key !== 'Enter') return;
+    if (event.key !== 'Enter' || event.repeat) return;
     if (!dismissed) return;
     const startView = document.getElementById('viewStart');
     if (!startView || startView.hidden) return;
-    const currentView = (window.location.hash || '').replace('#', '') || 'start';
     if (currentView !== 'start') return;
     if (!startGateMenuShown && startGate) {
       event.preventDefault();
-      startGate.classList.add('start-gate--ready');
-      revealStartMenu();
+      skipToMenu();
     }
   });
 
-  const kickstart = () => {
-    if (!bgMusic || isMuted()) return;
-    if (bgMusic.paused) tryPlayBgMusic();
-    if (!bgMusic.paused) {
-      window.removeEventListener('pointerdown', kickstart, true);
-      window.removeEventListener('keydown', kickstart, true);
-    }
+  // The music only plays while this page is the active window. It pauses when another
+  // window takes focus (joining a level opens Content Manager / the CSP car select on
+  // top, switching apps, another tab) and resumes where it left off on coming back,
+  // unless sound is muted. `blur`/`focus` cover other windows; `visibilitychange` covers
+  // tab switches and minimising, where focus events are not always sent.
+  const pauseForFocus = () => {
+    if (bgMusic && musicStarted) bgMusic.pause();
   };
-  window.addEventListener('pointerdown', kickstart, true);
-  window.addEventListener('keydown', kickstart, true);
-
-  // Resume music when returning to the tab (e.g. after CM launches)
-  document.addEventListener('visibilitychange', () => {
-    if (document.hidden) return;
-    if (isMuted()) return;
+  const resumeForFocus = () => {
+    if (document.hidden || !document.hasFocus() || isMuted()) return;
     if (bgMusic && bgMusic.paused) tryPlayBgMusic();
-  });
-
-  // Joining hands off to Content Manager, so pause the music. Offline cards have no href.
-  levelCards.forEach((card) => {
-    card.addEventListener('click', () => {
-      if (card.hasAttribute('href') && bgMusic) bgMusic.pause();
-    });
+  };
+  window.addEventListener('blur', pauseForFocus);
+  window.addEventListener('focus', resumeForFocus);
+  document.addEventListener('visibilitychange', () => {
+    if (document.hidden) pauseForFocus();
+    else resumeForFocus();
   });
 });

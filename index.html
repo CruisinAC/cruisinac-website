@@ -8,7 +8,7 @@
   <title>Cruisin AC</title>
   <link rel="preconnect" href="https://fonts.googleapis.com" />
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
-  <link href="https://fonts.googleapis.com/css2?family=Orbitron:wght@500;700;800&family=Rajdhani:wght@400;500;600;700&display=swap" rel="stylesheet" />
+  <link href="https://fonts.googleapis.com/css2?family=Orbitron:wght@500;700;800&family=Rajdhani:wght@400;500;600;700&family=Exo+2:ital,wght@1,600;1,800&display=swap" rel="stylesheet" />
   <link rel="stylesheet" href="styles.css" />
 </head>
 <body>
@@ -22,15 +22,15 @@
       <img class="intro__layer intro__layer--ac" src="assets/images/logo-layer-ac.png" alt="" />
     </div>
     <p class="intro__text">Presents</p>
+    <p class="intro__press">Press Enter to Start</p>
   </div>
 
   <section class="view" id="viewStart" data-view="start" hidden>
     <main class="start-gate" id="startGate">
-      <img class="start-gate__logo" id="startGateLogo" src="assets/images/initial-driftrun-placeholder.svg" alt="Initial DriftRun logo" />
-      <p class="start-gate__prompt" id="startGatePrompt">Press Enter to Start</p>
+      <img class="start-gate__logo" id="startGateLogo" src="assets/images/initial_driftrun_logo_v0.1.svg" alt="Initial DriftRun logo" />
       <nav class="start-menu" id="startMenu" aria-label="Game menu">
-        <a class="start-menu__item start-menu__item--primary" href="#level-select" data-view-link="level-select">Level Select</a>
-        <span class="start-menu__item start-menu__item--disabled" aria-disabled="true">Options</span>
+        <a class="start-menu__item" href="#level-select" data-view-link="level-select">Level Select</a>
+        <a class="start-menu__item" href="#options" data-view-link="options">Options</a>
         <a class="start-menu__item" href="#leaderboard" data-view-link="leaderboard">Leaderboard</a>
         <a class="start-menu__item" href="#credits" data-view-link="credits">Credits</a>
       </nav>
@@ -45,7 +45,7 @@
         </div>
 
         <div class="level-select__header">
-          <img class="level-select__logo" src="assets/images/initial-driftrun-placeholder.svg" alt="Initial DriftRun logo" />
+          <img class="level-select__logo" src="assets/images/initial_driftrun_logo_v0.1.svg" alt="Initial DriftRun logo" />
           <h2 class="level-select__title">Level Select</h2>
         </div>
 
@@ -140,7 +140,7 @@
         </div>
 
         <div class="level-select__header">
-          <img class="level-select__logo" src="assets/images/initial-driftrun-placeholder.svg" alt="Initial DriftRun logo" />
+          <img class="level-select__logo" src="assets/images/initial_driftrun_logo_v0.1.svg" alt="Initial DriftRun logo" />
           <h2 class="level-select__title">Leaderboard</h2>
         </div>
 
@@ -194,6 +194,134 @@
     </main>
   </section>
 
+  <section class="view" id="viewOptions" data-view="options" hidden>
+    <main class="page">
+      <section class="panel">
+        <div class="page-bar">
+          <a class="button button--ghost" href="#start" data-view-link="start">Back</a>
+        </div>
+
+        <div class="level-select__header">
+          <img class="level-select__logo" src="assets/images/initial_driftrun_logo_v0.1.svg" alt="Initial DriftRun logo" />
+          <h2 class="level-select__title">Options</h2>
+        </div>
+
+        <nav class="start-menu options-menu" id="optionsMenu" aria-label="Options">
+          <a class="start-menu__item" href="#about" data-view-link="about">About</a>
+          <a class="start-menu__item" href="#how-to-play" data-view-link="how-to-play">How to Play</a>
+          <a class="start-menu__item" href="#controls" data-view-link="controls">Controls</a>
+          <a class="start-menu__item" href="#rules" data-view-link="rules">Rules</a>
+          <a class="start-menu__item" href="#downloads" data-view-link="downloads">Downloads / Installation</a>
+        </nav>
+      </section>
+    </main>
+  </section>
+
+  <!-- Options > About: placeholder until its content is written -->
+  <section class="view" id="viewAbout" data-view="about" hidden>
+    <main class="page">
+      <section class="panel">
+        <div class="page-bar">
+          <a class="button button--ghost" href="#options" data-view-link="options">Back</a>
+        </div>
+
+        <div class="level-select__header">
+          <img class="level-select__logo" src="assets/images/initial_driftrun_logo_v0.1.svg" alt="Initial DriftRun logo" />
+          <h2 class="level-select__title">About</h2>
+        </div>
+
+        <div class="under-construction">
+          <p class="under-construction__title">Under Construction</p>
+          <p class="under-construction__text">Coming soon</p>
+        </div>
+      </section>
+    </main>
+  </section>
+
+  <!-- Options > How to Play: placeholder until its content is written -->
+  <section class="view" id="viewHowToPlay" data-view="how-to-play" hidden>
+    <main class="page">
+      <section class="panel">
+        <div class="page-bar">
+          <a class="button button--ghost" href="#options" data-view-link="options">Back</a>
+        </div>
+
+        <div class="level-select__header">
+          <img class="level-select__logo" src="assets/images/initial_driftrun_logo_v0.1.svg" alt="Initial DriftRun logo" />
+          <h2 class="level-select__title">How to Play</h2>
+        </div>
+
+        <div class="under-construction">
+          <p class="under-construction__title">Under Construction</p>
+          <p class="under-construction__text">Coming soon</p>
+        </div>
+      </section>
+    </main>
+  </section>
+
+  <!-- Options > Controls: placeholder until its content is written -->
+  <section class="view" id="viewControls" data-view="controls" hidden>
+    <main class="page">
+      <section class="panel">
+        <div class="page-bar">
+          <a class="button button--ghost" href="#options" data-view-link="options">Back</a>
+        </div>
+
+        <div class="level-select__header">
+          <img class="level-select__logo" src="assets/images/initial_driftrun_logo_v0.1.svg" alt="Initial DriftRun logo" />
+          <h2 class="level-select__title">Controls</h2>
+        </div>
+
+        <div class="under-construction">
+          <p class="under-construction__title">Under Construction</p>
+          <p class="under-construction__text">Coming soon</p>
+        </div>
+      </section>
+    </main>
+  </section>
+
+  <!-- Options > Rules: placeholder until its content is written -->
+  <section class="view" id="viewRules" data-view="rules" hidden>
+    <main class="page">
+      <section class="panel">
+        <div class="page-bar">
+          <a class="button button--ghost" href="#options" data-view-link="options">Back</a>
+        </div>
+
+        <div class="level-select__header">
+          <img class="level-select__logo" src="assets/images/initial_driftrun_logo_v0.1.svg" alt="Initial DriftRun logo" />
+          <h2 class="level-select__title">Rules</h2>
+        </div>
+
+        <div class="under-construction">
+          <p class="under-construction__title">Under Construction</p>
+          <p class="under-construction__text">Coming soon</p>
+        </div>
+      </section>
+    </main>
+  </section>
+
+  <!-- Options > Downloads / Installation: placeholder until its content is written -->
+  <section class="view" id="viewDownloads" data-view="downloads" hidden>
+    <main class="page">
+      <section class="panel">
+        <div class="page-bar">
+          <a class="button button--ghost" href="#options" data-view-link="options">Back</a>
+        </div>
+
+        <div class="level-select__header">
+          <img class="level-select__logo" src="assets/images/initial_driftrun_logo_v0.1.svg" alt="Initial DriftRun logo" />
+          <h2 class="level-select__title">Downloads / Installation</h2>
+        </div>
+
+        <div class="under-construction">
+          <p class="under-construction__title">Under Construction</p>
+          <p class="under-construction__text">Coming soon</p>
+        </div>
+      </section>
+    </main>
+  </section>
+
   <section class="view" id="viewCredits" data-view="credits" hidden>
     <main class="page">
       <section class="panel">
@@ -223,11 +351,32 @@
     </main>
   </section>
 
-  <audio id="bgMusic" src="assets/audio/Wolf%20and%20Raven%20-%20Lair%20of%20the%20Dragon%20-%2002%20Spirit%20Warriors.mp3" preload="auto" loop></audio>
-  <button id="muteToggle" class="mute-toggle" type="button" aria-label="Mute music" aria-pressed="false">
+  <audio id="bgMusic" src="assets/audio/Wolf%20and%20Raven%20-%20Lair%20of%20the%20Dragon%20-%2002%20Spirit%20Warriors.mp3" preload="auto"></audio>
+  <button id="fullscreenToggle" class="mute-toggle fullscreen-toggle" type="button" aria-label="Full screen" hidden>
+    <svg class="fullscreen-toggle__enter" viewBox="0 0 24 24" aria-hidden="true"><path d="M4 9V4h5M15 4h5v5M20 15v5h-5M9 20H4v-5" /></svg>
+    <svg class="fullscreen-toggle__exit" viewBox="0 0 24 24" aria-hidden="true"><path d="M9 4v5H4M20 9h-5V4M15 20v-5h5M4 15h5v5" /></svg>
+  </button>
+  <button id="muteToggle" class="mute-toggle" type="button" aria-label="Sound settings" aria-expanded="false" aria-controls="soundPanel">
     <span class="mute-toggle__icon" aria-hidden="true">🔊</span>
   </button>
+  <div class="sound-panel" id="soundPanel" role="group" aria-label="Sound" hidden>
+    <div class="sound-panel__title">Sound</div>
+    <label class="sound-panel__row">
+      <span class="sound-panel__label">Music</span>
+      <input class="sound-panel__slider" id="musicVolume" type="range" min="0" max="100" step="5" />
+      <output class="sound-panel__value" id="musicVolumeValue" for="musicVolume"></output>
+    </label>
+    <label class="sound-panel__row">
+      <span class="sound-panel__label">Effects</span>
+      <input class="sound-panel__slider" id="sfxVolume" type="range" min="0" max="100" step="5" />
+      <output class="sound-panel__value" id="sfxVolumeValue" for="sfxVolume"></output>
+    </label>
+    <button class="sound-panel__mute" id="soundMute" type="button" aria-pressed="false">Mute all</button>
+  </div>
 
+  <div class="key-legend" id="keyLegend" aria-hidden="true" hidden></div>
+
+  <script src="sfx.js"></script>
   <script src="script.js"></script>
 </body>
 </html>

@@ -13,6 +13,13 @@ The game mode itself is a separate project - see "Related Project" below.
   chrome, neon), with a **boot/intro animation** when it loads.
 - Brand colors come from the logo: orange-to-pink sunset stripes, neon blue "Cruisin'"
   script, chrome-edged red "AC".
+- Fonts (Google Fonts): **Orbitron** for headings, labels and menus, **Rajdhani** for body text,
+  and **Exo 2 SemiBold 600 Italic** for numbers (`--font-numbers` in `styles.css`; chosen
+  2026-10-10 to bring the site closer to the logos, after trying Kanit). Numbers = level badges,
+  the player count in Level Select status badges (`.status__count`, "Online · 3/8"),
+  leaderboard level tabs, leaderboard rank / score / time cells, Sound panel values. Exo 2 has
+  equal-width digits (`font-variant-numeric: tabular-nums`), so score and time columns line up.
+  Kanit does not; switching back would need per-digit fixed-width boxes.
 
 ## Assets (assets/images/)
 Copied from `C:\Users\mannr\Pictures\CruisinAC-Logo-images\` (originals untouched, renamed here):
@@ -26,6 +33,7 @@ Copied from `C:\Users\mannr\Pictures\CruisinAC-Logo-images\` (originals untouche
 | `logo-layer-ac.png` | 700x678, transparent | Logo layer: the chrome "AC" only |
 | `sun-centered.png` | 698x501 | Sun graphic, centered |
 | `wolf-and-raven-logo.jpg` | 800x800, black background | Wolf and Raven logo: chrome script, red sun, wolf and raven silhouette |
+| `initial_driftrun_logo_v0.1.svg` | 900x400, ~250 KB (embedded PNGs) | Initial DriftRun logo: chrome "INITIAL", red "D", chrome "RIFTRUN". Used on the title screen, Level Select and Leaderboard (replaced `initial-driftrun-placeholder.svg`, 2026-10-10) |
 
 The three `logo-layer-*` files share the same 700x678 canvas, so stacking them exactly
 reproduces the full logo - ideal for the boot animation (e.g. sun rises, script draws in,
@@ -40,6 +48,73 @@ Never use any `password_unlock_*.png` image - those contain real level passwords
 The in-game music is by **Wolf and Raven** (albums "Tribute to OutRun" and "Tokyo Turbo").
 The site must credit them visibly, with their logo and a link to
 **https://www.wolfandravenmusic.com/**.
+
+## Opening Sequence and Sound (2026-10-10)
+Browsers allow no sound until the visitor clicks, taps or presses a key, so the site opens on a
+landing screen that waits for one:
+
+1. **Landing:** only "PRESS ENTER TO START", flashing (`.intro__press` inside `#intro`).
+2. **First press** (Enter, click or tap): the coin sound, the prompt strobes for 0.45 s, and
+   the Cruisin AC "Presents" animation plays (sun, AC, Cruisin', Presents) with no music, so
+   it has room for its own sound effects.
+3. **Second press, or Presents finishing** (~6.8 s): the Initial DriftRun logo stamps in and
+   the music starts with it.
+4. **The menu appears by itself** when the stamp lands (1.2 s); a press during the stamp skips
+   straight to it. Held-down Enter (key repeat) is ignored, so one press = one step.
+
+- **Music:** starts as the Initial DriftRun logo stamps in (`startMusic`, called from
+  `handleStartView`; `tryPlayBgMusic` does nothing before it), fading in over `MUSIC_FADE_MS`
+  (1 s) to the Music slider's volume. Playback and every loop start at `MUSIC_START_SECONDS`
+  (2.7 s): the track is silent for its first 2.75 s. Looping is done by hand (`ended` event),
+  not the `loop` attribute, so repeats skip that silence too.
+  **The music only plays while the page is the active window:** it pauses on `blur` /
+  hidden tab (e.g. joining a level brings up Content Manager and the CSP car select) and
+  resumes where it left off on `focus` / visible again, unless Mute All is on. Before
+  2026-10-11 a level click paused it and only a tab switch resumed it, so it never came back.
+  Known limitation (accepted by the user): the CSP car select window appears on top without
+  taking focus, so the music keeps playing until the player clicks into that window. A page
+  can only see its own focus, not whether another window covers it. Browsers only let music start from a click or key press
+  (Safari strictly per element), so the first press calls `primeMusic`, which plays it muted
+  and pauses at once; that unlocks the later start, which has no press of its own. It was far too loud at the browser default of 1.0.
+  Live site: music was switched off entirely on 2026-10-10 (commit `d60d2ab`) until this
+  version is deployed.
+- **Full-screen button** (left of the speaker button; `script.js` "Full screen"): the browser
+  Fullscreen API on the whole page, so it only works from a real click. Esc or F11 also leaves
+  full screen and the icon follows. Hidden where the browser cannot do it (iPhone Safari only
+  allows video full screen).
+- **Sound panel** (the speaker button, top right): Music and Effects sliders (0-100) and Mute
+  All. Loudness = (slider / 100)^2, so the defaults `DEFAULT_MUSIC_LEVEL` 25 and
+  `DEFAULT_SFX_LEVEL` 60 (top of `script.js`) are 0.06 and 0.36. Slider positions are saved in
+  `localStorage` (`cruisinAcVolume`); Mute All is per browser tab (`sessionStorage`). The
+  Effects slider blips as it moves so the level can be heard. Esc or a click elsewhere closes it.
+- **Sound effects** live in `sfx.js`, synthesised with the Web Audio API (no audio files):
+  `coin` (two-note coin drop: the first press on the landing screen), `start` (coin + whoosh +
+  synth-brass stab; not used since the user asked for just the coin), `select` (confirm; also a press
+  that skips Presents or the logo stamp), `thump` (thud + reverb tail; unused: the logo landing has no sound effect, as the music starting there does that job (user, 2026-10-11); an explosive smash was also tried and rejected as awful and too loud), `move` (cursor), `tick`
+  (tabs, Score/Time, pager, car filter, speaker button), `back`, `denied` (offline level,
+  Options; joining an online level plays `select`; the engine-rev `launch` sound there was
+  deleted on 2026-10-11 as awful). The user is not keen on most
+  of these yet (2026-10-10); they are to be adjusted or replaced later, not removed.
+- **Keyboard menus** (`script.js`, "Menu cursor and sounds"): Up/Down moves a highlighted
+  cursor on the title menu and Level Select (mouse hover moves it too), Enter confirms,
+  Esc/Backspace goes back, Left/Right changes level on the Leaderboard. Returning to the title
+  menu puts the cursor on the item you came from. A key-hint bar (`#keyLegend`) shows the keys
+  per view, hidden on touch screens.
+
+## Options Menu (2026-10-10)
+Title menu > **Options** (`#options`) is a second menu in the same arcade style, with five
+pages: **About** (`#about`), **How to Play** (`#how-to-play`), **Controls** (`#controls`),
+**Rules** (`#rules`) and **Downloads / Installation** (`#downloads`). Each page is its own
+`<section class="view">` in `index.html` and currently shows an UNDER CONSTRUCTION placeholder
+(`.under-construction`); replace that block with the real content.
+
+Planned content for Downloads / Installation: links to the sites where players download the
+cars and tracks.
+
+Navigation: `VIEW_PARENT` at the top of `script.js` says where Back / Esc goes from each view
+(a page -> Options -> title menu). Coming back to a menu puts the cursor on the item you left.
+A new view needs: a `<section class="view" data-view="...">`, an entry in `VALID_VIEWS` and
+`VIEW_PARENT`, and a line in `KEY_LEGENDS`.
 
 ## Joining a Server From a Link
 AssettoServer prints a Content Manager invite link at startup, in this format:
@@ -103,8 +178,10 @@ servers, their ports and the public address used in join links live in the API's
 `game_servers.json`, not in this site. A card's level number comes from its rank badge
 ("01" -> 1).
 
-Local test: start the API, serve this folder with `python -m http.server 5500`, open
-http://localhost:5500 and choose Leaderboard.
+Local test: start the API, serve this folder with `python dev_server.py` (port 5500), open
+http://localhost:5500 and choose Leaderboard. Use `dev_server.py`, not `python -m http.server`:
+the plain server has no HTTP range requests, so the browser cannot jump into the music file
+and it always plays from 0 (ignoring `MUSIC_START_SECONDS`). Cloudflare Pages supports them.
 
 ## Plan (staged)
 **Stage 1 - static site, no backend (current stage).**

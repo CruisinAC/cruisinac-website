@@ -3,5 +3,7 @@
 # page (and the new API) until their cache expired. Re-check these on every load instead.
 /script.js
   Cache-Control: public, max-age=0, must-revalidate
+/sfx.js
+  Cache-Control: public, max-age=0, must-revalidate
 /styles.css
   Cache-Control: public, max-age=0, must-revalidate
