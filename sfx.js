@@ -82,9 +82,81 @@ const Sfx = (() => {
 
   // Called from the first click / tap / key press; creating or resuming the audio
   // context is only allowed inside such an input.
+  // ---- Recorded sounds (assets/audio), for the Cruisin AC intro ----
+  // Downloaded as soon as the page loads (no press needed for that), decoded once sound is
+  // unlocked. They go through the same master volume as everything else, so the Effects
+  // slider and Mute All apply.
+  const SAMPLE_FILES = {
+    surf: 'assets/audio/the-cries-of-seagulls-and-the-sound-of-the-surf.mp3',
+    flicker: 'assets/audio/vadim_makes_sound-cyberpunk-neon-sign-flicker-and-electric-buzz-546577.mp3',
+    crash: 'assets/audio/freesound_community-car-accident-with-squeal-and-crash-6054.mp3',
+  };
+  const sampleBytes = {}; // name -> Promise<ArrayBuffer | null>
+  const sampleBuffers = {}; // name -> Promise<AudioBuffer | null>
+
+  Object.entries(SAMPLE_FILES).forEach(([name, url]) => {
+    sampleBytes[name] = fetch(url)
+      .then((response) => (response.ok ? response.arrayBuffer() : null))
+      .catch(() => null);
+  });
+
+  const decodeSample = (name) => {
+    if (!sampleBuffers[name]) {
+      sampleBuffers[name] = sampleBytes[name].then((bytes) => (bytes && ctx
+        ? ctx.decodeAudioData(bytes.slice(0)).catch(() => null)
+        : null));
+    }
+    return sampleBuffers[name];
+  };
+
   const unlock = () => {
     if (!ctx && !build()) return;
     if (ctx.state === 'suspended') ctx.resume().catch(() => {});
+    Object.keys(SAMPLE_FILES).forEach(decodeSample);
+  };
+
+  // Play a recorded sound now. Options: gain, fadeIn / fadeOut (seconds), duration (play only
+  // this much of it, then fade out). Returns { stop(fadeSeconds) }. If the file is still
+  // decoding it starts as soon as it is ready, skipped ahead by the time lost, so it stays
+  // in step with the animation it belongs to.
+  const playSample = (name, { gain = 1, fadeIn = 0.02, fadeOut = 0.15, duration = null } = {}) => {
+    const requested = now();
+    let source = null;
+    let amp = null;
+    let stopped = false;
+    if (requested === null || !sampleBuffers[name]) return { stop() {} };
+
+    sampleBuffers[name].then((buffer) => {
+      if (!buffer || stopped || muted()) return;
+      const t = ctx.currentTime + 0.005;
+      const late = Math.max(0, t - requested);
+      if (late >= buffer.duration) return;
+      source = ctx.createBufferSource();
+      source.buffer = buffer;
+      amp = ctx.createGain();
+      amp.gain.setValueAtTime(0.0001, t);
+      amp.gain.exponentialRampToValueAtTime(gain, t + Math.max(0.005, fadeIn));
+      source.connect(amp).connect(bus);
+      source.start(t, late); // before any stop(): browsers reject stop() on an unstarted source
+      if (duration !== null) {
+        const end = t + Math.max(0.05, duration - late);
+        amp.gain.setValueAtTime(gain, Math.max(t + fadeIn, end - fadeOut));
+        amp.gain.exponentialRampToValueAtTime(0.0001, end);
+        source.stop(end + 0.05);
+      }
+    });
+
+    return {
+      stop(fade = 0.5) {
+        stopped = true;
+        if (!source || !amp) return;
+        const t = ctx.currentTime;
+        amp.gain.cancelScheduledValues(t);
+        amp.gain.setValueAtTime(Math.max(amp.gain.value, 0.0001), t);
+        amp.gain.exponentialRampToValueAtTime(0.0001, t + fade);
+        try { source.stop(t + fade + 0.05); } catch { /* already stopped */ }
+      },
+    };
   };
 
   // Start time for a sound, or null when sound is not available / muted.
@@ -246,5 +318,5 @@ const Sfx = (() => {
     if (master) master.gain.setTargetAtTime(Math.max(value, 0.0001), ctx.currentTime, 0.02);
   };
 
-  return { unlock, setVolume, ...sounds };
+  return { unlock, setVolume, playSample, ...sounds };
 })();

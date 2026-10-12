@@ -14,6 +14,15 @@
   --shadow: 0 24px 90px rgba(0, 0, 0, 0.45);
   /* Numbers: a bold, slanted racing face (words stay Orbitron / Rajdhani) */
   --font-numbers: 'Exo 2', 'Orbitron', sans-serif;
+  /* Synthwave-sun cuts for the gradient number badges (like logo-layer-sun.png and the
+     landing screen's WELCOME): solid on top, then three horizontal gaps, each wider than the
+     last, starting just below the digits, which they would otherwise hide. Used as a mask
+     on the badge's gradient only, so the digits stay whole. */
+  --sun-cuts: linear-gradient(180deg,
+    #000 0 67%, transparent 67% 71%,
+    #000 71% 78%, transparent 78% 84%,
+    #000 84% 90%, transparent 90% 96%,
+    #000 96% 100%);
 }
 
 * {
@@ -224,8 +233,8 @@ h3 {
   gap: 8px;
   padding: 8px 12px;
   border-radius: 999px;
-  font: 700 0.82rem/1 'Orbitron', sans-serif;
-  letter-spacing: 0.12em;
+  font: italic 600 0.9rem/1 var(--font-numbers);
+  letter-spacing: 0.08em;
   text-transform: uppercase;
 }
 
@@ -240,6 +249,80 @@ h3 {
   color: #10131f;
   background: linear-gradient(90deg, var(--sunset), var(--pink));
   box-shadow: 0 0 0 1px rgba(255, 255, 255, 0.15) inset;
+}
+
+/* An earned password, in a tray under its level card (script.js applyPasswordToCard) */
+.level-password {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 10px 14px;
+  margin: -12px 22px 0;
+  padding: 12px 18px;
+  border: 1px solid rgba(255, 179, 71, 0.3);
+  border-top: none;
+  border-radius: 0 0 16px 16px;
+  background: rgba(10, 12, 25, 0.75);
+}
+
+.level-password__label {
+  color: var(--sunset);
+  font: italic 600 0.82rem/1 var(--font-numbers);
+  letter-spacing: 0.1em;
+  text-transform: uppercase;
+}
+
+.level-password__value {
+  flex: 1 1 140px;
+  min-width: 0;
+  color: var(--text);
+  font: italic 600 1.1rem/1.2 var(--font-numbers);
+  letter-spacing: 0.06em;
+  overflow-wrap: anywhere;
+  user-select: all;
+}
+
+/* Level 1's tray: nothing to show or copy */
+.level-password--open .level-password__value {
+  color: var(--muted);
+  user-select: auto;
+}
+
+.level-password__button {
+  padding: 7px 14px;
+  border-radius: 999px;
+  border: 1px solid rgba(255, 255, 255, 0.16);
+  background: rgba(255, 255, 255, 0.05);
+  color: var(--text);
+  font: italic 600 0.8rem/1 var(--font-numbers);
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+  cursor: pointer;
+  transition: border-color 160ms ease, color 160ms ease;
+}
+
+.level-password__button:hover,
+.level-password__button:focus-visible {
+  border-color: rgba(68, 210, 255, 0.5);
+  color: var(--blue);
+  outline: none;
+}
+
+/* Not unlocked: signed out (any level after 1), or the previous level is not finished */
+.status--locked {
+  color: rgba(255, 170, 170, 0.9);
+  background: rgba(255, 108, 108, 0.08);
+  border: 1px solid rgba(255, 108, 108, 0.4);
+}
+
+/* A padlock before the word */
+.status--locked::before {
+  content: '';
+  width: 12px;
+  height: 12px;
+  background: currentColor;
+  -webkit-mask: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24'%3E%3Crect x='4' y='10' width='16' height='11' rx='2.5' fill='black'/%3E%3Cpath d='M8 10V7a4 4 0 0 1 8 0v3' fill='none' stroke='black' stroke-width='2.6'/%3E%3C/svg%3E") center / contain no-repeat;
+  mask: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24'%3E%3Crect x='4' y='10' width='16' height='11' rx='2.5' fill='black'/%3E%3Cpath d='M8 10V7a4 4 0 0 1 8 0v3' fill='none' stroke='black' stroke-width='2.6'/%3E%3C/svg%3E") center / contain no-repeat;
 }
 
 .status--offline {
@@ -384,16 +467,31 @@ h3 {
 }
 
 .level-card__rank {
+  position: relative;
+  isolation: isolate;
   display: grid;
   place-items: center;
   width: 64px;
   height: 64px;
   border-radius: 18px;
   color: #10131f;
-  background: linear-gradient(180deg, var(--sunset), var(--pink));
   font: italic 800 1.6rem/1 var(--font-numbers);
   letter-spacing: 0.02em;
 }
+
+/* The badge's gradient, cut like the sun (behind the digits, which stay whole) */
+.level-card__rank::before,
+.leaderboard-tab__number::before {
+  content: '';
+  position: absolute;
+  inset: 0;
+  z-index: -1;
+  border-radius: inherit;
+  background: linear-gradient(180deg, var(--sunset), var(--pink));
+  -webkit-mask: var(--sun-cuts) no-repeat;
+  mask: var(--sun-cuts) no-repeat;
+}
+
 
 .level-card__preview {
   position: relative;
@@ -427,6 +525,53 @@ h3 {
   margin-bottom: 6px;
   font-size: 1.05rem;
   text-transform: uppercase;
+}
+
+/* Locked / Finished (script.js applyProgressToCard). Locked cards stay selectable with
+   the cursor; choosing one buzzes instead of joining. */
+.level-card--locked .level-card__preview img {
+  filter: grayscale(0.85) brightness(0.6);
+}
+
+.level-card--locked .level-card__rank {
+  filter: grayscale(0.85);
+  opacity: 0.6;
+}
+
+.level-card--locked .level-card__body h3 {
+  color: rgba(243, 245, 255, 0.62);
+}
+
+/* A big padlock over the greyed thumbnail */
+.level-card--locked .level-card__preview::after {
+  content: '';
+  position: absolute;
+  left: 50%;
+  top: 50%;
+  width: 34px;
+  height: 34px;
+  transform: translate(-50%, -50%);
+  background: rgba(243, 245, 255, 0.85);
+  -webkit-mask: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24'%3E%3Crect x='4' y='10' width='16' height='11' rx='2.5' fill='black'/%3E%3Cpath d='M8 10V7a4 4 0 0 1 8 0v3' fill='none' stroke='black' stroke-width='2.6'/%3E%3C/svg%3E") center / contain no-repeat;
+  mask: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24'%3E%3Crect x='4' y='10' width='16' height='11' rx='2.5' fill='black'/%3E%3Cpath d='M8 10V7a4 4 0 0 1 8 0v3' fill='none' stroke='black' stroke-width='2.6'/%3E%3C/svg%3E") center / contain no-repeat;
+  filter: drop-shadow(0 2px 6px rgba(0, 0, 0, 0.6));
+  pointer-events: none;
+}
+
+.level-card__finished {
+  display: inline-flex;
+  margin: 0 0 8px;
+  padding: 4px 10px;
+  border-radius: 999px;
+  color: #10131f;
+  background: linear-gradient(90deg, var(--sunset), var(--pink));
+  font: 800 0.66rem/1 'Orbitron', sans-serif;
+  letter-spacing: 0.14em;
+  text-transform: uppercase;
+}
+
+.level-card__finished[hidden] {
+  display: none;
 }
 
 .level-card__body p {
@@ -566,6 +711,134 @@ dd {
 
 .mute-toggle__icon {
   line-height: 1;
+}
+
+/* Steam sign-in: top-left corner, mirroring the round buttons top right */
+.account-button {
+  position: fixed;
+  top: 18px;
+  left: 20px;
+  z-index: 50;
+  height: 44px;
+  max-width: min(260px, calc(100vw - 160px));
+  display: inline-flex;
+  align-items: center;
+  gap: 10px;
+  padding: 0 16px 0 12px;
+  border-radius: 999px;
+  border: 1px solid rgba(255, 255, 255, 0.18);
+  background: rgba(15, 20, 38, 0.6);
+  color: rgba(243, 245, 255, 0.92);
+  backdrop-filter: blur(8px);
+  cursor: pointer;
+  font: 700 0.72rem/1 'Orbitron', sans-serif;
+  letter-spacing: 0.12em;
+  text-transform: uppercase;
+  transition: transform 160ms ease, background 160ms ease, border-color 160ms ease;
+}
+
+.account-button[hidden] {
+  display: none;
+}
+
+.account-button:hover,
+.account-button:focus-visible {
+  transform: translateY(-1px);
+  background: rgba(20, 26, 48, 0.72);
+  border-color: rgba(68, 210, 255, 0.4);
+  outline: none;
+}
+
+.account-button__icon {
+  flex: none;
+  width: 18px;
+  height: 18px;
+  fill: none;
+  stroke: currentColor;
+  stroke-width: 2;
+  stroke-linecap: round;
+}
+
+.account-button__label {
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+/* Signed in: the player's name, as they wrote it */
+.account-button.is-signed-in {
+  border-color: rgba(68, 210, 255, 0.45);
+}
+
+.account-button.is-signed-in .account-button__icon {
+  color: var(--blue);
+}
+
+.account-button.is-signed-in .account-button__label {
+  font: 700 1rem/1 'Rajdhani', sans-serif;
+  letter-spacing: 0.02em;
+  text-transform: none;
+}
+
+.account-panel {
+  left: 20px;
+  right: auto;
+}
+
+.account-panel__name {
+  color: var(--text);
+  font: 700 1.2rem/1.2 'Rajdhani', sans-serif;
+  overflow-wrap: anywhere;
+}
+
+.account-panel__id {
+  margin-top: -6px;
+  color: var(--muted);
+  font: italic 600 0.85rem/1 var(--font-numbers);
+  letter-spacing: 0.02em;
+}
+
+/* The sign-in popup's last page, shown for a moment before it closes itself */
+.popup-done {
+  min-height: 100vh;
+  display: grid;
+  place-items: center;
+  padding: 24px;
+  text-align: center;
+  color: var(--text);
+  font: 700 1rem/1.4 'Orbitron', sans-serif;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+}
+
+/* "Signed in as ...", "Signed out.", sign-in errors */
+.account-toast {
+  position: fixed;
+  top: 72px;
+  left: 20px;
+  z-index: 49;
+  max-width: min(360px, calc(100vw - 40px));
+  padding: 10px 14px;
+  border-radius: 12px;
+  border: 1px solid rgba(68, 210, 255, 0.4);
+  background: rgba(12, 16, 30, 0.92);
+  color: var(--text);
+  font: 600 1rem/1.3 'Rajdhani', sans-serif;
+  box-shadow: 0 12px 30px rgba(0, 0, 0, 0.4);
+  animation: liftUp 180ms ease;
+}
+
+.account-toast[hidden] {
+  display: none;
+}
+
+.account-toast.is-error {
+  border-color: rgba(255, 108, 108, 0.6);
+}
+
+/* Room above the page panels for the corner buttons */
+body .page {
+  padding-top: 76px;
 }
 
 /* Full-screen button: same round style, left of the speaker button */
@@ -1153,13 +1426,14 @@ dd {
 }
 
 .leaderboard-tab__number {
+  position: relative;
+  isolation: isolate;
   display: grid;
   place-items: center;
   width: 32px;
   height: 32px;
   border-radius: 10px;
   color: #10131f;
-  background: linear-gradient(180deg, var(--sunset), var(--pink));
   font: italic 600 1rem/1 var(--font-numbers);
 }
 
@@ -1194,20 +1468,11 @@ dd {
   justify-content: space-between;
   align-items: center;
   gap: 10px 20px;
-  margin-bottom: 14px;
+  margin-bottom: 30px;
 }
 
 .leaderboard__heading h3 {
   font-size: 1.05rem;
-}
-
-.leaderboard__rule {
-  flex-basis: 100%;
-  max-width: 34rem;
-  margin: 0;
-  color: var(--muted);
-  font-size: 0.98rem;
-  line-height: 1.45;
 }
 
 .leaderboard__controls {
@@ -1343,6 +1608,15 @@ dd {
 
 .leaderboard__table tbody tr:first-child td {
   background: rgba(255, 179, 71, 0.08);
+}
+
+/* The signed-in player's own row */
+.leaderboard__table tr.is-me td {
+  background: rgba(68, 210, 255, 0.12);
+}
+
+.leaderboard__table tr.is-me td:first-child {
+  box-shadow: inset 3px 0 0 var(--blue);
 }
 
 .leaderboard__rank {
@@ -1507,7 +1781,8 @@ dd {
 }
 
 .intro--sun .intro__layer--sun {
-  animation: sunDrop 1.7s cubic-bezier(0.2, 0.75, 0.28, 1) forwards;
+  /* Slow and gentle, so the descent is watched while the surf plays (INTRO_* in script.js) */
+  animation: sunDrop 3.2s cubic-bezier(0.25, 0.6, 0.3, 1) forwards;
 }
 
 .intro--ac .intro__layer--ac {
@@ -1559,6 +1834,23 @@ dd {
   display: none;
 }
 
+/* Fade to black between PRESS ENTER TO START and the Cruisin AC screen (script.js
+   BLACKOUT_*): in over 0.8 s, back out over 0.8 s */
+.intro__blackout {
+  position: absolute;
+  inset: 0;
+  z-index: 5;
+  background: #000;
+  opacity: 0;
+  pointer-events: none;
+  transition: opacity 0.8s ease;
+}
+
+.intro--blackout .intro__blackout {
+  opacity: 1;
+  transition-duration: 0.8s;
+}
+
 /* Landing screen: PRESS START TO ENTER flashes until the first press */
 .intro:not(.intro--started) {
   cursor: pointer;
@@ -1578,17 +1870,125 @@ dd {
   font: 800 clamp(1rem, 2.6vw, 1.6rem)/1.3 'Orbitron', sans-serif;
   letter-spacing: 0.2em;
   text-transform: uppercase;
-  animation: promptBlink 0.9s steps(2, end) infinite;
+  /* Hidden until WELCOME has opened (see welcomeOpen), then flashing */
+  opacity: 0;
+  animation: promptBlink 0.9s steps(2, end) 1.55s infinite;
 }
 
 /* Pressed: a fast strobe for a moment, then the Presents animation takes over */
 .intro--pressed .intro__press {
   color: var(--sunset);
-  animation: promptBlink 0.1s steps(2, end) infinite;
+  /* 8 quick flashes (0.8 s), then it stays lit until the fade to black (PRESS_STROBE_MS) */
+  animation: promptBlink 0.1s steps(2, end) 8 forwards;
 }
 
 .intro--started .intro__press {
   display: none;
+}
+
+/* WELCOME, big and steady above the flashing prompt. Placed with `bottom`, not a transform:
+   Firefox does not paint gradient-clipped text (background-clip: text) on a transformed
+   element, so with translateY the word was invisible there. */
+/* WELCOME, big and steady above the flashing prompt. Two layers: the inner text is the
+   gradient letters with the sun cuts masked out of them (so the background shows through
+   the gaps), and the outer element adds the glow around the already-cut letters. Masking
+   the glow too would draw the cuts across the spaces between letters.
+   Placed with `bottom`, not a transform: Firefox does not paint gradient-clipped text
+   (background-clip: text) on a transformed element, so the word went invisible there. */
+.intro__welcome {
+  position: absolute;
+  left: 0;
+  right: 0;
+  bottom: calc(50% + 3.4rem); /* 3.4rem above the prompt */
+  z-index: 2;
+  margin: 0;
+  padding: 0 16px;
+  text-align: center;
+  font: 800 clamp(2.4rem, 8vw, 5.2rem)/1.1 'Orbitron', sans-serif;
+  letter-spacing: 0.16em;
+  text-transform: uppercase;
+  filter: drop-shadow(0 0 18px rgba(255, 79, 163, 0.45));
+}
+
+/* Synthwave-sun cuts: solid on top, then five horizontal gaps from about three quarters of
+   the way up the letters, each wider than the last (like logo-layer-sun.png). The letters
+   fill roughly 17-85% of this box's height. */
+.intro__welcome-text {
+  display: inline-block;
+  color: var(--sunset);
+  background: linear-gradient(180deg, #ffe08a 17%, var(--sunset) 50%, var(--pink) 86%);
+  -webkit-background-clip: text;
+  background-clip: text;
+  -webkit-text-fill-color: transparent;
+  -webkit-mask: linear-gradient(180deg,
+    #000 0 37%, transparent 37% 39%,
+    #000 39% 46%, transparent 46% 49%,
+    #000 49% 55%, transparent 55% 59%,
+    #000 59% 64.5%, transparent 64.5% 69.5%,
+    #000 69.5% 74.5%, transparent 74.5% 80.5%,
+    #000 80.5% 100%) no-repeat;
+  mask: linear-gradient(180deg,
+    #000 0 37%, transparent 37% 39%,
+    #000 39% 46%, transparent 46% 49%,
+    #000 49% 55%, transparent 55% 59%,
+    #000 59% 64.5%, transparent 64.5% 69.5%,
+    #000 69.5% 74.5%, transparent 74.5% 80.5%,
+    #000 80.5% 100%) no-repeat;
+}
+
+.intro--started .intro__welcome {
+  display: none;
+}
+
+/* WELCOME's intro: a glowing line grows out from the centre along the word's horizontal
+   midline (welcomeLine), then the word opens up and down from that line (welcomeOpen, a
+   clip-path, not a transform, which would make Firefox drop the gradient text). */
+.intro__welcome-word {
+  position: relative;
+  display: inline-block;
+}
+
+.intro__welcome-text {
+  animation: welcomeOpen 1.4s cubic-bezier(0.33, 0.9, 0.4, 1) both;
+}
+
+.intro__welcome-word::after {
+  content: '';
+  position: absolute;
+  left: 0;
+  right: 0.16em; /* the trailing letter-spacing after the last letter */
+  top: 50%;
+  height: 3px;
+  margin-top: -1.5px;
+  border-radius: 2px;
+  background: linear-gradient(90deg, transparent, var(--pink) 18%, #fff 50%, var(--pink) 82%, transparent);
+  opacity: 0;
+  pointer-events: none;
+  animation: welcomeLine 1.4s ease-out both;
+}
+
+@keyframes welcomeLine {
+  0% { opacity: 1; transform: scaleX(0); }
+  32% { opacity: 1; transform: scaleX(1); }
+  75% { opacity: 0.5; transform: scaleX(1); }
+  100% { opacity: 0; transform: scaleX(1); }
+}
+
+@keyframes welcomeOpen {
+  0%,
+  32% { clip-path: inset(50% 0 50% 0); }
+  100% { clip-path: inset(0 0 0 0); }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .intro__welcome-text,
+  .intro__welcome-word::after {
+    animation: none;
+  }
+
+  .intro__press {
+    animation-delay: 0s;
+  }
 }
 
 body.is-loaded .hero,

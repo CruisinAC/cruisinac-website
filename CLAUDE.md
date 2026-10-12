@@ -54,7 +54,9 @@ Browsers allow no sound until the visitor clicks, taps or presses a key, so the 
 landing screen that waits for one:
 
 1. **Landing:** only "PRESS ENTER TO START", flashing (`.intro__press` inside `#intro`).
-2. **First press** (Enter, click or tap): the coin sound, the prompt strobes for 0.45 s, and
+2. **First press** (Enter, click or tap): the coin sound, the prompt strobes for 0.8 s and
+   holds lit, the screen fades to black (0.8 s, from 1 s after the press), the surf and gulls start in the dark (~1 s of black), then
+   the black fades away (0.8 s) to the Cruisin AC screen just before the sun drops, and
    the Cruisin AC "Presents" animation plays (sun, AC, Cruisin', Presents) with no music, so
    it has room for its own sound effects.
 3. **Second press, or Presents finishing** (~6.8 s): the Initial DriftRun logo stamps in and
@@ -87,6 +89,22 @@ landing screen that waits for one:
   `DEFAULT_SFX_LEVEL` 60 (top of `script.js`) are 0.06 and 0.36. Slider positions are saved in
   `localStorage` (`cruisinAcVolume`); Mute All is per browser tab (`sessionStorage`). The
   Effects slider blips as it moves so the level can be heard. Esc or a click elsewhere closes it.
+- **Cruisin AC intro sounds** (2026-10-11): recorded files in `assets/audio/`, played through
+  the sound engine (`Sfx.playSample`, so the Effects slider and Mute All apply): surf and gulls
+  (`the-cries-of-seagulls-...mp3`) from the sun drop until the intro ends (0.6 s fade-in);
+  the neon buzz (`vadim_makes_sound-...-546577.mp3`) for 1.3 s with the Cruisin' flicker; the
+  car crash (`freesound_community-...-6054.mp3`; levels `SURF_VOLUME` 0.6, `FLICKER_VOLUME` 1,
+  `CRASH_VOLUME` 0.55 at the top of `script.js`, set by ear on 2026-10-11)
+  timed so its impact, 1.45 s into the file, lands when AC reaches its place (68% of
+  acZoomIn). The file's own end is a second of silence, so aligning the file end would have
+  put the crash a second early. Played through, the surf starts fading as the crash's tail dies away
+  (`CRASH_TAIL_MS`) and reaches silence as the logo screen arrives; a skip fades every intro
+  sound over 0.6 s. Phase timings and the crash alignment are the `INTRO_*`, `AC_LANDS_MS` and
+  `CRASH_IMPACT_MS` constants at the top of `script.js`; the intro order is now sun (3.2 s drop),
+  then Cruisin' (as the sun settles, 2.7 s), a short pause, then the crash squeal and AC
+  (5.15 s), Presents at 6.75 s (all from the start of the intro). Testing note: headless Edge with
+  `--virtual-time-budget` never finishes decoding the large surf file, so check audio
+  timing in a real-time browser.
 - **Sound effects** live in `sfx.js`, synthesised with the Web Audio API (no audio files):
   `coin` (two-note coin drop: the first press on the landing screen), `start` (coin + whoosh +
   synth-brass stab; not used since the user asked for just the coin), `select` (confirm; also a press
@@ -152,9 +170,9 @@ its `scripts/watch_jsonl.py`). Settings at the top of `script.js`:
   visitor on their next load instead of after Pages' default four-hour asset cache.
 - `LEVELS` - each level's number, name and track key. The key is `TRACK-CONFIG_TRACK` from that
   level server's `server_cfg.ini`, the same `Track` the plugin records.
-- `LEADERBOARD_SORTS` - the two boards behind the Score / Time toggle and the one-line rule
-  shown for each. Score: highest score, ties to the faster time. Time: fastest run, ties to
-  whoever set it first. A player's row can be a different run on each board. The ranked
+- `LEADERBOARD_SORTS` - the two boards behind the Score / Time toggle. Score: highest score,
+  ties to the faster time. Time: fastest run, ties to whoever set it first. (A one-line rule
+  under the level name used to spell this out; removed at the user's request on 2026-10-11.) A player's row can be a different run on each board. The ranked
   column is highlighted via the table's `data-sort` attribute.
 - The car dropdown and the car names in the table come from the API's `GET /cars`
   (`cars.json` there, model folder -> display name). Choosing a car adds `&car=` and
@@ -167,6 +185,58 @@ its `scripts/watch_jsonl.py`). Settings at the top of `script.js`:
   A plain list response (the pre-paging shape) is still accepted during a switchover.
 
 Player names come from players, so they are only ever inserted with `textContent`, never as HTML.
+
+## Sign In Through Steam (2026-10-11)
+The **account button, top left** (`#accountButton`, `script.js` "Steam sign-in"). Signed
+out it reads SIGN IN WITH STEAM and sends the player to the API's `/auth/steam/login?view=<current
+view>`; the API does the Steam part (see `cruisinac-api` `app/routers/auth.py` and
+`docs/LEVEL_UNLOCK_PLAN.md`) and sends them back to `/?login=ok#<view>` (or `?login=failed`).
+The button is **hidden on the landing screen and during the Cruisin AC intro**; it appears with
+the first view (the title screen's logo stamp, where the music starts). A `?login=` return shows
+the landing screen as **PRESS ENTER TO CONTINUE** (a new page may not play music before a press);
+that press plays the coin, skips the Cruisin AC intro and goes back to the view the player left
+(the title screen with its logo stamp and music, or another view with music straight away). A
+small toast says "Signed in as ..." or what failed.
+
+**Sign-in opens Steam in a popup** (`startSignIn`, `?popup=true` on the login URL), so the
+page and its music stay where the player is. The API returns the popup to
+`/?login=ok&popup=1#<view>`; `IS_SIGNIN_POPUP` at the top of `script.js` then replaces the popup's
+page with a short note, posts the result on a `BroadcastChannel` (`cruisinac-auth`, not
+`window.opener`, which a site on the way may cut) and closes it; the main window loads the
+account and shows the toast. If the popup is blocked (or no BroadcastChannel), the button
+falls back to leaving the page, which returns via WELCOME BACK as described above.
+
+Signed in, the button shows the player's name; clicking it opens a panel with name, Steam ID
+and Sign out. The site reads `GET /me` and `GET /me/progress` with `credentials: 'include'`
+(the cookie is the API's, HttpOnly; the site never sees it).
+
+- **Level Select:** a level whose previous level is not finished shows **Locked** (wins over
+  Online), loses its Join link (buzzes like offline cards) and reads "Finish Level N to
+  unlock."; finished levels get a FINISHED chip (`applyProgressToCard`). Progress refreshes
+  with the 15 s server-status poll.
+- **Leaderboard:** the signed-in player's own row is highlighted (`tr.is-me`).
+- **Signed out:** every level after Level 1 is Locked ("Sign in with Steam to unlock."; the
+  user's choice, 2026-10-11). Level 1 is open to everyone. Clicking a locked card buzzes
+  (`Sfx.denied`), shakes, and signed out also shows a toast pointing at the sign-in button.
+  Locked cards keep the cursor, get a padlock on the badge and over a greyed thumbnail.
+- **Passwords** (`GET /me/passwords`, only for the signed-in player, only those earned:
+  finishing Level N earns Level N+1's): a tray under each unlocked card whose password was
+  earned (`.level-password`, `applyPasswordToCard`), dots until **Show**, plus **Copy**. It
+  is a sibling of the card, not inside it, because the card is the Join link. Rows hide again
+  each time Level Select opens. Level 1's card always has a tray too (signed in or out):
+  "Not needed · open to every driver", or signed out "Not needed · sign in with Steam to see the
+  passwords you earn" (`.level-password--open`), which also evens out the spacing. Finishes
+  count whether or not the player was signed in on the site: the game server records them by
+  Steam ID, so signing in later shows every password already earned (no need to redo a level).
+  Tray text and the status badges (ONLINE / LOCKED / ...) use Exo 2 SemiBold Italic like the numbers. Passwords are never in the site's code or files; the game
+  no longer shows them once the plugin's `PasswordWebsiteUrl` is set.
+- The lock is only a display; the real gate is still each level's password from the plugin.
+
+**Local testing:** the live API runs without these settings until it is configured, so test
+against a test copy of the API on port 8001 (started with `PUBLIC_API_URL=http://localhost:8001`,
+`SITE_URL=http://localhost:5500` and a `SESSION_SECRET`), and open
+`http://localhost:5500/?api=8001`: on localhost, `?api=<port>` points that browser tab at
+another API port (kept in `sessionStorage`).
 
 ## Server Status (Level Select)
 Level cards are not hard-coded Online/Offline. While Level Select is open, `script.js` polls

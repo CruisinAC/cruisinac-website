@@ -61,6 +61,9 @@ class RangeRequestHandler(SimpleHTTPRequestHandler):
 
     def end_headers(self):
         self.send_header("Accept-Ranges", "bytes")
+        # Local testing: never let the browser reuse an old copy of a file, so every reload
+        # shows the latest edit (without this, Firefox kept serving a stale index.html).
+        self.send_header("Cache-Control", "no-store")
         super().end_headers()
 
 
