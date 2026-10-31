@@ -1391,6 +1391,22 @@ body .page {
   border: 1px solid rgba(255, 255, 255, 0.08);
 }
 
+.credit-card--banner {
+  grid-template-columns: minmax(0, 1fr);
+}
+
+.credit-card__banner {
+  width: 100%;
+  aspect-ratio: 4;
+  object-fit: cover;
+  border-radius: 18px;
+  border: 1px solid rgba(255, 255, 255, 0.08);
+}
+
+.credit-card + .section-heading {
+  margin-top: 28px;
+}
+
 .credit-card__copy h3 {
   font-size: 1.1rem;
   margin-bottom: 8px;
