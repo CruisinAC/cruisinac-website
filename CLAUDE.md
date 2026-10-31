@@ -110,12 +110,17 @@ landing screen that waits for one:
   allowed, full screen held with an app opening on top, and the user confirmed it with the real
   car select. F11 holds even through the box, but a page cannot trigger F11. A page cannot skip
   the box or go back by itself (requestFullscreen was refused 1 s later: no fresh press). So
-  (`script.js`, right after "Full screen"): a drop within `JOIN_DROP_MS` (1 s) of a join shows
-  the "Always allow" hint for `JOIN_HINT_MS` (12 s), bottom centre (`.account-toast.is-bottom`)
-  so the box at the top does not cover it, and the next press goes back to full screen. Players
-  who ticked the box never see any of it. requestFullscreen uses up the press, so joining,
-  buttons and links out of the site are skipped (window.open for sign-in needs that press);
-  menu links, the page itself and the arrow keys go back. Esc never does. Going back on an arrow
+  (`script.js`, right after "Full screen"): a drop within `EXPECTED_DROP_MS` (1 s) of a join
+  shows the "Always allow" hint for `JOIN_HINT_MS` (12 s), bottom centre
+  (`.account-toast.is-bottom`) so the box at the top does not cover it, and the next press goes
+  back to full screen. Players who ticked the box never see any of it. The Steam sign-in popup
+  and the Credits links (new tab) drop full screen too, so they arm the same return with no hint
+  (`expectFullscreenDrop`). Anything else the site adds that opens a window or tab needs that
+  call as well. A drop the player chose (Esc, the button) is never undone. requestFullscreen
+  uses up the press, so `NEEDS_ITS_OWN_PRESS` lists what is skipped (window.open for sign-in
+  needs that press); every other button, menu links, the page itself and the arrow keys go
+  back. Sign-in's fallback when the popup is blocked leaves the page, so it comes back windowed.
+  Esc never does. Going back on an arrow
   key still moves the cursor, unless the mouse rests on a tile: the layout change re-selects
   whatever is under it. **Firefox** (user's test, 2026-10-31) does not hold full screen when the
   car select appears, so it gets no hint (`IS_FIREFOX`, user agent check); the next press still

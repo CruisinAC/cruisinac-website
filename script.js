@@ -948,6 +948,7 @@ window.addEventListener('load', () => {
   const startSignIn = () => {
     const view = VALID_VIEWS.includes(currentView) ? currentView : 'start';
     const loginUrl = `${API_BASE_URL}/auth/steam/login?view=${encodeURIComponent(view)}`;
+    expectFullscreenDrop();
     if (authChannel) {
       const width = 820;
       const height = 720;
@@ -1042,18 +1043,31 @@ window.addEventListener('load', () => {
     document.addEventListener('webkitfullscreenchange', syncFullscreenButton);
   }
 
-  // Joining a level: the browser's "Open Content Manager?" box drops full screen, the other
-  // window does not. Once the player ticks "Always allow" the box stops appearing and full
-  // screen holds. A page cannot skip the box or go back by itself, so only a drop right after
-  // a join gets the hint (players who ticked the box never see it), and the next press goes
-  // back. requestFullscreen uses up the press, so presses that need it themselves (joining,
-  // sign-in, links out of the site, Copy) are left alone and the one after goes back.
-  const JOIN_DROP_MS = 1000;
+  // Things the site itself does that drop full screen: the Steam sign-in popup, a Credits link
+  // opening a tab, and joining a level. A page cannot go back by itself, so the next press
+  // does (a drop the player chose, with Esc or the button, is left alone). For a join it is
+  // the browser's "Open Content Manager?" box that drops it, not the other window: once the
+  // player ticks "Always allow" the box stops appearing and full screen holds, so only a drop
+  // right after a join gets the hint (players who ticked the box never see it).
+  // requestFullscreen uses up the press, so presses that need it themselves (joining, sign-in,
+  // links out of the site, Copy) are left alone and the one after goes back.
+  const EXPECTED_DROP_MS = 1000;
   const JOIN_HINT_MS = 12000;
   const RETURN_KEYS = ['ArrowUp', 'ArrowDown', 'ArrowLeft', 'ArrowRight', 'Enter', 'Backspace'];
+  const NEEDS_ITS_OWN_PRESS = '#accountButton, #fullscreenToggle, .level-password, input, select, textarea, a[href]:not([data-view-link])';
   const IS_FIREFOX = navigator.userAgent.includes('Firefox'); // ticking the box does not hold full screen there
-  let joinedFromFullscreenAt = null;
+  let expectedDrop = null; // { at, hint } while something the site did may drop full screen
   let returnToFullscreen = false;
+
+  const expectFullscreenDrop = ({ hint = false } = {}) => {
+    if (fullscreenElement()) expectedDrop = { at: performance.now(), hint };
+  };
+
+  const takeExpectedDrop = () => {
+    const expected = expectedDrop && performance.now() - expectedDrop.at < EXPECTED_DROP_MS ? expectedDrop : null;
+    expectedDrop = null;
+    return expected;
+  };
 
   const noteFullscreenChange = () => {
     if (fullscreenElement()) {
@@ -1061,12 +1075,10 @@ window.addEventListener('load', () => {
       if (accountToast.classList.contains('is-bottom')) accountToast.hidden = true;
       return;
     }
-    const droppedByJoin = joinedFromFullscreenAt !== null
-      && performance.now() - joinedFromFullscreenAt < JOIN_DROP_MS;
-    joinedFromFullscreenAt = null;
-    if (!droppedByJoin) return;
+    const expected = takeExpectedDrop();
+    if (!expected) return;
     returnToFullscreen = true;
-    if (IS_FIREFOX) return;
+    if (!expected.hint || IS_FIREFOX) return;
     showToast('Tick "Always allow" in the browser\'s box to stay in full screen next time.', false,
       { bottom: true, duration: JOIN_HINT_MS });
   };
@@ -1075,10 +1087,10 @@ window.addEventListener('load', () => {
     if (!returnToFullscreen) return;
     const isKey = event.type === 'keydown';
     if (isKey && (!RETURN_KEYS.includes(event.key) || event.altKey || event.ctrlKey || event.metaKey)) return;
-    const pressesTarget = !isKey || event.key === 'Enter';
-    const element = isKey && event.key === 'Enter' ? selected || event.target : event.target;
-    const leaveAlone = pressesTarget ? 'button, input, select, textarea, a[href]:not([data-view-link])' : 'input, select, textarea';
-    if (element.closest && element.closest(leaveAlone)) return;
+    const isPress = !isKey || event.key === 'Enter';
+    const pressed = isKey && event.key === 'Enter' ? [event.target, selected] : [event.target];
+    const leaveAlone = isPress ? NEEDS_ITS_OWN_PRESS : 'input, select, textarea';
+    if (pressed.some((element) => element && element.closest && element.closest(leaveAlone))) return;
     returnToFullscreen = false;
     toggleFullscreen();
   };
@@ -1086,6 +1098,10 @@ window.addEventListener('load', () => {
   if (canFullscreen) {
     document.addEventListener('fullscreenchange', noteFullscreenChange);
     document.addEventListener('webkitfullscreenchange', noteFullscreenChange);
+    // A new tab hides this page, and a hidden page only hears of the drop once it is shown again.
+    document.addEventListener('visibilitychange', () => {
+      if (document.hidden && takeExpectedDrop()) returnToFullscreen = true;
+    });
     window.addEventListener('click', goBackToFullscreen, true);
     window.addEventListener('keydown', goBackToFullscreen, true);
   }
@@ -1219,12 +1235,15 @@ window.addEventListener('load', () => {
       } else {
         Sfx.select();
         flash(card, 'is-launching', 900);
-        if (fullscreenElement()) joinedFromFullscreenAt = performance.now();
+        expectFullscreenDrop({ hint: true });
       }
     });
   });
 
-  document.querySelectorAll('.credit-card').forEach((card) => card.addEventListener('click', () => Sfx.select()));
+  document.querySelectorAll('.credit-card').forEach((card) => card.addEventListener('click', () => {
+    Sfx.select();
+    expectFullscreenDrop();
+  }));
 
   // Leaderboard controls (the tabs are rebuilt on every render, so listen on their container).
   leaderboardTabs.addEventListener('click', (event) => { if (event.target.closest('.leaderboard-tab')) Sfx.tick(); });
