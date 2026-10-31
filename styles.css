@@ -1403,6 +1403,14 @@ body .page {
   border: 1px solid rgba(255, 255, 255, 0.08);
 }
 
+.credit-card__banner--logo {
+  aspect-ratio: auto;
+  height: 160px;
+  padding: 22px;
+  object-fit: contain;
+  background: rgba(0, 0, 0, 0.35);
+}
+
 .credit-card + .section-heading {
   margin-top: 28px;
 }

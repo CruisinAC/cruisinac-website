@@ -34,6 +34,7 @@ Copied from `C:\Users\mannr\Pictures\CruisinAC-Logo-images\` (originals untouche
 | `sun-centered.png` | 698x501 | Sun graphic, centered |
 | `wolf-and-raven-logo.jpg` | 800x800, black background | Wolf and Raven logo: chrome script, red sun, wolf and raven silhouette |
 | `ek-track-mods-banner.webp` | 1600x400, ~810 KB | EK Track Mods banner (`ek_project_banner.webp`), for the track credit. Lazy-loaded, so only a Credits visit fetches it |
+| `srp-logo-main-white.svg` | ~6 KB, vector, white on transparent | Shutoko Revival Project logo, for the car credit. Their site states no terms for its use |
 | `initial_driftrun_logo_v0.1.svg` | 900x400, ~250 KB (embedded PNGs) | Initial DriftRun logo: chrome "INITIAL", red "D", chrome "RIFTRUN". Used on the title screen, Level Select and Leaderboard (replaced `initial-driftrun-placeholder.svg`, 2026-10-10) |
 
 The three `logo-layer-*` files share the same 700x678 canvas, so stacking them exactly
@@ -56,6 +57,18 @@ released free as **EK Track Mods**. The Credits page credits them below Wolf and
 their banner and a link to **https://www.patreon.com/c/u38695696/posts**. The banner is 4:1, so
 its card is `.credit-card--banner` (image on top) instead of the square logo layout. A level
 on a track by anyone else would make the page's "All Initial DriftRun levels" line wrong.
+
+## Car Credit (2026-10-30)
+The third Credits section points players to the **Car Pack** at
+**https://shutokorevivalproject.com/** (home page, not the versioned `SRP_Car_Pack_3.6.7z`
+link, which would go stale). Keep the wording to "modded cars and traffic":
+
+- SRP distributes the pack but did not build these cars (the `ddm_` cars' author is ДЯДЯ ДИМА, the
+  traffic cars' Opperslang + Just Kauser), so the page must not say SRP made them.
+- Checked against the pack 3.6 file list on 2026-10-30: all six `traffic_*` cars and the
+  seven `ddm_*` / `p3_*` cars on the level servers are in it. `bmw_m3_e30_s1`,
+  `ks_toyota_ae86_tuned` and `ks_toyota_supra_mkiv` are NOT: they are official AC cars.
+- The site does not say the pack is free, so the page does not either.
 
 ## Opening Sequence and Sound (2026-10-10)
 Browsers allow no sound until the visitor clicks, taps or presses a key, so the site opens on a
