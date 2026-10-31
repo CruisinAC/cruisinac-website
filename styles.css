@@ -256,9 +256,9 @@ h3 {
   display: flex;
   flex-wrap: wrap;
   align-items: center;
-  gap: 10px 14px;
-  margin: -12px 22px 0;
-  padding: 12px 18px;
+  gap: 10px 8px;
+  margin: -12px 12px 0;
+  padding: 22px 14px 12px;
   border: 1px solid rgba(255, 179, 71, 0.3);
   border-top: none;
   border-radius: 0 0 16px 16px;
@@ -266,17 +266,20 @@ h3 {
 }
 
 .level-password__label {
+  flex: 1 1 auto;
   color: var(--sunset);
   font: italic 600 0.82rem/1 var(--font-numbers);
   letter-spacing: 0.1em;
   text-transform: uppercase;
 }
 
+/* Label and buttons on the first line, the password on its own below them */
 .level-password__value {
-  flex: 1 1 140px;
+  order: 1;
+  flex: 1 0 100%;
   min-width: 0;
   color: var(--text);
-  font: italic 600 1.1rem/1.2 var(--font-numbers);
+  font: italic 600 1.05rem/1.2 var(--font-numbers);
   letter-spacing: 0.06em;
   overflow-wrap: anywhere;
   user-select: all;
@@ -285,11 +288,12 @@ h3 {
 /* Level 1's tray: nothing to show or copy */
 .level-password--open .level-password__value {
   color: var(--muted);
+  font-size: 0.92rem;
   user-select: auto;
 }
 
 .level-password__button {
-  padding: 7px 14px;
+  padding: 6px 10px;
   border-radius: 999px;
   border: 1px solid rgba(255, 255, 255, 0.16);
   background: rgba(255, 255, 255, 0.05);
@@ -339,9 +343,21 @@ h3 {
   border: 1px dashed rgba(255, 255, 255, 0.18);
 }
 
+/* Arcade course grid: as many columns as fit (3 on a desktop), new levels start a new row */
 .level-select {
   display: grid;
-  gap: 12px;
+  grid-template-columns: repeat(auto-fill, minmax(min(290px, 100%), 1fr));
+  column-gap: 20px;
+}
+
+/* A tile and its password tray (script.js adds the tray right after the card). Two rows
+   shared across the grid, so tiles line up whether or not their neighbours have a tray. */
+.level-slot {
+  display: grid;
+  grid-row: span 2;
+  grid-template-rows: subgrid;
+  min-width: 0;
+  padding-bottom: 20px;
 }
 
 .level-select__header {
@@ -363,6 +379,36 @@ h3 {
   letter-spacing: 0.22em;
   text-transform: uppercase;
   color: rgba(243, 245, 255, 0.9);
+}
+
+/* Level Select only: a shorter header, so both rows of tiles fit on a screen */
+#viewLevelSelect .level-select__header {
+  gap: 10px;
+  margin: -44px 0 18px;
+}
+
+#viewLevelSelect .level-select__logo {
+  width: min(280px, 58vw);
+}
+
+#viewLevelSelect .level-select__title {
+  color: var(--sunset);
+  background: linear-gradient(180deg, #ffe08a 17%, var(--sunset) 50%, var(--pink) 86%);
+  -webkit-background-clip: text;
+  background-clip: text;
+  -webkit-text-fill-color: transparent;
+}
+
+/* Signed out, in place of Level 1's password tray (script.js applyPasswordToCard) */
+.level-select__note {
+  margin: 0;
+  color: var(--muted);
+  font-size: 0.95rem;
+  text-align: center;
+}
+
+.level-select__note[hidden] {
+  display: none;
 }
 
 /* Options menu: the title menu's buttons, on a page panel */
@@ -430,12 +476,10 @@ h3 {
 }
 
 .level-card {
-  display: grid;
-  grid-template-columns: 64px 160px minmax(0, 1fr) auto;
-  gap: 18px;
-  align-items: center;
-  padding: 18px 20px;
-  border-radius: 20px;
+  display: flex;
+  flex-direction: column;
+  min-width: 0;
+  border-radius: 12px;
   background: linear-gradient(180deg, var(--panel), var(--panel-strong));
   border: 1px solid rgba(255, 255, 255, 0.1);
   box-shadow: inset 0 1px 0 rgba(255, 255, 255, 0.05);
@@ -466,17 +510,37 @@ h3 {
   outline-offset: 3px;
 }
 
+/* The number and the status sit on the tile's picture */
 .level-card__rank {
-  position: relative;
+  position: absolute;
+  top: 10px;
+  left: 10px;
+  z-index: 2;
   isolation: isolate;
   display: grid;
   place-items: center;
-  width: 64px;
-  height: 64px;
-  border-radius: 18px;
+  width: 48px;
+  height: 48px;
+  border-radius: 12px;
   color: #10131f;
-  font: italic 800 1.6rem/1 var(--font-numbers);
+  font: italic 800 1.4rem/1 var(--font-numbers);
   letter-spacing: 0.02em;
+}
+
+.level-card .status {
+  position: absolute;
+  top: 10px;
+  right: 10px;
+  z-index: 2;
+  padding: 7px 10px;
+  font-size: 0.78rem;
+}
+
+.level-card .status--offline,
+.level-card .status--locked,
+.level-card .status--checking,
+.level-card .status--unknown {
+  background-color: rgba(10, 12, 25, 0.82);
 }
 
 /* The badge's gradient, cut like the sun (behind the digits, which stay whole) */
@@ -496,10 +560,25 @@ h3 {
 .level-card__preview {
   position: relative;
   overflow: hidden;
-  border-radius: 14px;
-  border: 1px solid rgba(255, 255, 255, 0.14);
+  border-radius: 11px 11px 0 0;
   background: rgba(7, 10, 18, 0.7);
   aspect-ratio: 16 / 9;
+  transition: filter 160ms ease;
+}
+
+/* Arcade monitor scanlines over the picture */
+.level-card__preview::before {
+  content: '';
+  position: absolute;
+  inset: 0;
+  z-index: 1;
+  background: repeating-linear-gradient(180deg, rgba(0, 0, 0, 0.2) 0 1px, transparent 1px 3px);
+  pointer-events: none;
+}
+
+/* The cursor's tile stays lit, the others dim */
+.level-select:has(.level-card.is-selected) .level-card:not(.is-selected) .level-card__preview {
+  filter: brightness(0.68) saturate(0.8);
 }
 
 .level-card__preview img {
@@ -521,9 +600,15 @@ h3 {
   filter: drop-shadow(0 0 3px rgba(0, 0, 0, 0.9)) drop-shadow(0 0 10px rgba(68, 210, 255, 0.55));
 }
 
+.level-card__body {
+  position: relative;
+  padding: 12px 14px 14px;
+}
+
 .level-card__body h3 {
   margin-bottom: 6px;
-  font-size: 1.05rem;
+  font-size: 0.98rem;
+  line-height: 1.3;
   text-transform: uppercase;
 }
 
@@ -531,6 +616,10 @@ h3 {
    the cursor; choosing one buzzes instead of joining. */
 .level-card--locked .level-card__preview img {
   filter: grayscale(0.85) brightness(0.6);
+}
+
+.level-card--locked .level-card__preview .level-card__map {
+  opacity: 0.4;
 }
 
 .level-card--locked .level-card__rank {
@@ -548,19 +637,23 @@ h3 {
   position: absolute;
   left: 50%;
   top: 50%;
-  width: 34px;
-  height: 34px;
+  z-index: 2;
+  width: 44px;
+  height: 44px;
   transform: translate(-50%, -50%);
-  background: rgba(243, 245, 255, 0.85);
+  background: rgba(243, 245, 255, 0.9);
   -webkit-mask: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24'%3E%3Crect x='4' y='10' width='16' height='11' rx='2.5' fill='black'/%3E%3Cpath d='M8 10V7a4 4 0 0 1 8 0v3' fill='none' stroke='black' stroke-width='2.6'/%3E%3C/svg%3E") center / contain no-repeat;
   mask: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24'%3E%3Crect x='4' y='10' width='16' height='11' rx='2.5' fill='black'/%3E%3Cpath d='M8 10V7a4 4 0 0 1 8 0v3' fill='none' stroke='black' stroke-width='2.6'/%3E%3C/svg%3E") center / contain no-repeat;
   filter: drop-shadow(0 2px 6px rgba(0, 0, 0, 0.6));
   pointer-events: none;
 }
 
+/* A sticker on the edge of the picture, so a finished level's tile keeps its height */
 .level-card__finished {
+  position: absolute;
+  top: -11px;
+  left: 14px;
   display: inline-flex;
-  margin: 0 0 8px;
   padding: 4px 10px;
   border-radius: 999px;
   color: #10131f;
@@ -577,8 +670,8 @@ h3 {
 .level-card__body p {
   margin: 0;
   color: var(--muted);
-  font-size: 0.98rem;
-  line-height: 1.45;
+  font-size: 0.95rem;
+  line-height: 1.35;
 }
 
 .launch-fallback {
@@ -1219,21 +1312,28 @@ body .page {
   -webkit-tap-highlight-color: transparent;
 }
 
+/* The cursor: four corner brackets around the tile */
 .level-card::before {
+  --cursor: linear-gradient(var(--cursor-color), var(--cursor-color));
+  --cursor-color: var(--sunset);
   content: '';
   position: absolute;
-  left: -15px;
-  top: 50%;
-  margin-top: -8px;
-  border-style: solid;
-  border-width: 8px 0 8px 12px;
-  border-color: transparent transparent transparent var(--sunset);
+  inset: -7px;
+  z-index: 3;
+  background:
+    var(--cursor) 0 0 / 26px 4px, var(--cursor) 0 0 / 4px 26px,
+    var(--cursor) 100% 0 / 26px 4px, var(--cursor) 100% 0 / 4px 26px,
+    var(--cursor) 0 100% / 26px 4px, var(--cursor) 0 100% / 4px 26px,
+    var(--cursor) 100% 100% / 26px 4px, var(--cursor) 100% 100% / 4px 26px;
+  background-repeat: no-repeat;
   filter: drop-shadow(0 0 6px rgba(255, 179, 71, 0.8));
   opacity: 0;
+  pointer-events: none;
 }
 
 .level-card.is-selected {
-  transform: translateX(6px);
+  z-index: 3;
+  transform: scale(1.015);
   border-color: rgba(68, 210, 255, 0.75);
   box-shadow:
     0 0 0 1px rgba(68, 210, 255, 0.3),
@@ -1248,7 +1348,7 @@ body .page {
 
 .level-card.is-selected::before {
   opacity: 1;
-  animation: cursorNudgeRight 0.5s steps(2, end) infinite;
+  animation: cursorPinch 0.5s steps(2, end) infinite;
 }
 
 .level-card.is-selected:not(.level-card--live) {
@@ -1258,7 +1358,7 @@ body .page {
 }
 
 .level-card.is-selected:not(.level-card--live)::before {
-  border-color: transparent transparent transparent var(--hot);
+  --cursor-color: var(--hot);
   filter: none;
 }
 
@@ -1338,6 +1438,11 @@ body .page {
 @keyframes cursorNudgeLeft {
   0% { transform: translateX(0); }
   50% { transform: translateX(-4px); }
+}
+
+@keyframes cursorPinch {
+  0% { transform: scale(1); }
+  50% { transform: scale(0.985); }
 }
 
 @keyframes deniedShake {
@@ -2149,18 +2254,8 @@ body.is-loaded .credit-section {
     display: grid;
   }
 
-  .section-heading,
-  .level-card {
+  .section-heading {
     align-items: start;
-  }
-
-  .level-card {
-    grid-template-columns: 54px 132px minmax(0, 1fr);
-  }
-
-  .level-card .status {
-    grid-column: 1 / -1;
-    justify-self: start;
   }
 
   .launch-fallback {
@@ -2187,23 +2282,6 @@ body.is-loaded .credit-section {
 
   h1 {
     max-width: none;
-  }
-
-  .level-card {
-    padding: 16px;
-    gap: 14px;
-    grid-template-columns: 54px minmax(0, 1fr);
-  }
-
-  .level-card__rank {
-    width: 54px;
-    height: 54px;
-    border-radius: 16px;
-    font-size: 1.05rem;
-  }
-
-  .level-card__preview {
-    grid-column: 1 / -1;
   }
 
   .leaderboard {

@@ -134,6 +134,7 @@ window.addEventListener('load', () => {
   const views = document.querySelectorAll('.view');
   const startGate = document.getElementById('startGate');
   const levelCards = document.querySelectorAll('.level-card');
+  const levelSelectNote = document.getElementById('levelSelectNote');
   const leaderboardTabs = document.getElementById('leaderboardTabs');
   const leaderboardLevelName = document.getElementById('leaderboardLevelName');
   const leaderboardSort = document.getElementById('leaderboardSort');
@@ -785,10 +786,11 @@ window.addEventListener('load', () => {
   };
 
   // Called with the card's progress: a row for an unlocked level whose password was earned.
-  // Level 1 is open to everyone, so its tray says no password is needed (shown signed in
-  // or out; it also keeps the first two cards evenly spaced). Signed out, it also says that
-  // passwords are on the website: finishes count whether or not the player is signed in
-  // here (the game server records them by Steam ID), so signing in later shows them all.
+  // Level 1 is open to everyone, so signed in its tray says no password is needed. Signed
+  // out, the note under the title says so instead (a tray under one tile would leave a gap
+  // under its neighbours) and that passwords are on the website: finishes count whether or
+  // not the player is signed in here (the game server records them by Steam ID), so
+  // signing in later shows them all.
   const makeOpenLevelRow = (level) => {
     const row = document.createElement('div');
     row.className = 'level-password level-password--open';
@@ -805,14 +807,17 @@ window.addEventListener('load', () => {
   const applyPasswordToCard = (card, locked) => {
     const level = cardLevel(card);
     if (level === 1) {
+      levelSelectNote.hidden = Boolean(account);
       let row = passwordRow(card);
+      if (!account) {
+        if (row) row.remove();
+        return;
+      }
       if (!row) {
         row = makeOpenLevelRow(level);
         card.after(row);
       }
-      row.querySelector('.level-password__value').textContent = account
-        ? 'Not needed \u00b7 open to every driver'
-        : 'Not needed \u00b7 sign in with Steam to see the passwords you earn';
+      row.querySelector('.level-password__value').textContent = 'Not needed \u00b7 open to every driver';
       return;
     }
     const earned = Boolean(account && !locked && passwords && passwords.get(level));
@@ -1047,6 +1052,7 @@ window.addEventListener('load', () => {
   const keyLegend = document.getElementById('keyLegend');
   let currentView = null;
   let selected = null;
+  let lastLevelCard = null; // the cursor comes back here when Level Select is reopened
 
   // Disabled menu items and offline level cards can still be highlighted (and buzz when chosen).
   startMenuItems.forEach((item) => { if (!item.hasAttribute('href')) item.tabIndex = -1; });
@@ -1070,6 +1076,7 @@ window.addEventListener('load', () => {
     if (!item || item === selected) return;
     clearSelection();
     selected = item;
+    if (item.classList.contains('level-card')) lastLevelCard = item;
     item.classList.add('is-selected');
     if (document.activeElement !== item) item.focus({ preventScroll: true });
     item.scrollIntoView({ block: 'nearest', behavior: 'smooth' });
@@ -1096,6 +1103,40 @@ window.addEventListener('load', () => {
       ? items[direction > 0 ? 0 : items.length - 1]
       : items[(index + direction + items.length) % items.length];
     select(next, { direction });
+  };
+
+  // Level Select is a grid with as many columns as fit (CSS auto-fill), so ask the browser.
+  const levelGridColumns = () => {
+    const grid = document.querySelector('.level-select');
+    return window.getComputedStyle(grid).gridTemplateColumns.split(' ').length;
+  };
+
+  // Left / Right step through the levels in order, Up / Down move along a column; all wrap.
+  // The last row can be short, so moving down from above a gap lands on the last level.
+  const moveGridCursor = (key) => {
+    const items = [...levelCards];
+    const index = items.indexOf(selected);
+    if (index === -1) {
+      select(items[0]);
+      return;
+    }
+    const last = items.length - 1;
+    const columns = levelGridColumns();
+    let next;
+    if (key === 'ArrowRight') {
+      next = index === last ? 0 : index + 1;
+    } else if (key === 'ArrowLeft') {
+      next = index === 0 ? last : index - 1;
+    } else if (key === 'ArrowDown') {
+      if (index + columns <= last) next = index + columns;
+      else if (Math.floor(index / columns) < Math.floor(last / columns)) next = last;
+      else next = index % columns;
+    } else {
+      next = index - columns >= 0
+        ? index - columns
+        : Math.min(last - (last % columns) + (index % columns), last);
+    }
+    select(items[next], { direction: key === 'ArrowRight' || key === 'ArrowDown' ? 1 : -1 });
   };
 
   // Mouse hover moves the cursor (not touch: a tap would blip and confirm at once).
@@ -1151,7 +1192,7 @@ window.addEventListener('load', () => {
   // The key hints along the bottom of the screen, per view (hidden on touch screens).
   const KEY_LEGENDS = {
     start: [['\u2191\u2193', 'Select'], ['Enter', 'Confirm']],
-    'level-select': [['\u2191\u2193', 'Select'], ['Enter', 'Join'], ['Esc', 'Back']],
+    'level-select': [['\u2190\u2191\u2193\u2192', 'Select'], ['Enter', 'Join'], ['Esc', 'Back']],
     leaderboard: [['\u2190\u2192', 'Level'], ['Esc', 'Back']],
     credits: [['Esc', 'Back']],
     options: [['\u2191\u2193', 'Select'], ['Enter', 'Confirm'], ['Esc', 'Back']],
@@ -1189,6 +1230,12 @@ window.addEventListener('load', () => {
         Sfx.back();
         goToView(VIEW_PARENT[currentView] || 'start');
       }
+      return;
+    }
+
+    if (currentView === 'level-select' && event.key.startsWith('Arrow')) {
+      event.preventDefault();
+      moveGridCursor(event.key);
       return;
     }
 
@@ -1234,6 +1281,10 @@ window.addEventListener('load', () => {
     if (menu && menu.length > 0) {
       const cameFrom = menu.find((item) => item.dataset.viewLink === previousView);
       select(cameFrom || menu[0], { sound: false });
+    }
+    // An arcade select screen always has a cursor on something (not on touch screens).
+    if (target === 'level-select' && window.matchMedia('(hover: hover)').matches) {
+      select(lastLevelCard || levelCards[0], { sound: false });
     }
     renderKeyLegend();
   };

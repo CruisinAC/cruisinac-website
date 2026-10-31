@@ -135,7 +135,7 @@ landing screen that waits for one:
   deleted on 2026-10-11 as awful). The user is not keen on most
   of these yet (2026-10-10); they are to be adjusted or replaced later, not removed.
 - **Keyboard menus** (`script.js`, "Menu cursor and sounds"): Up/Down moves a highlighted
-  cursor on the title menu and Level Select (mouse hover moves it too), Enter confirms,
+  cursor on the title menu, all four arrows on the Level Select grid (mouse hover moves it too), Enter confirms,
   Esc/Backspace goes back, Left/Right changes level on the Leaderboard. Returning to the title
   menu puts the cursor on the item you came from. A key-hint bar (`#keyLegend`) shows the keys
   per view, hidden on touch screens.
@@ -244,9 +244,9 @@ and Sign out. The site reads `GET /me` and `GET /me/progress` with `credentials:
   finishing Level N earns Level N+1's): a tray under each unlocked card whose password was
   earned (`.level-password`, `applyPasswordToCard`), dots until **Show**, plus **Copy**. It
   is a sibling of the card, not inside it, because the card is the Join link. Rows hide again
-  each time Level Select opens. Level 1's card always has a tray too (signed in or out):
-  "Not needed · open to every driver", or signed out "Not needed · sign in with Steam to see the
-  passwords you earn" (`.level-password--open`), which also evens out the spacing. Finishes
+  each time Level Select opens. Signed in, Level 1's card has a tray too, "Not needed · open to
+  every driver" (`.level-password--open`). Signed out it has none (a tray under one tile leaves
+  a hole under its neighbours): `#levelSelectNote` under the title says the same. Finishes
   count whether or not the player was signed in on the site: the game server records them by
   Steam ID, so signing in later shows every password already earned (no need to redo a level).
   Tray text and the status badges (ONLINE / LOCKED / ...) use Exo 2 SemiBold Italic like the numbers. Passwords are never in the site's code or files; the game
@@ -258,6 +258,27 @@ against a test copy of the API on port 8001 (started with `PUBLIC_API_URL=http:/
 `SITE_URL=http://localhost:5500` and a `SESSION_SECRET`), and open
 `http://localhost:5500/?api=8001`: on localhost, `?api=<port>` points that browser tab at
 another API port (kept in `sessionStorage`).
+
+## Level Select Grid (2026-10-30)
+An arcade course-select screen instead of the old vertical list: three tiles across on a
+desktop, two rows for the six levels. The columns are CSS `auto-fill` (minimum tile width
+290px), so a window gets as many as fit (2 on a tablet, 1 on a phone) and new levels simply
+start a new row.
+
+- **Adding a level:** copy a whole `.level-slot` block in `index.html`, change the rank badge
+  (its number is how `cardLevel` finds the level), pictures, name and text, and add it to
+  `LEVELS` in `script.js`. No layout changes needed; tested with seven.
+- **`.level-slot`** wraps each card because the password tray must stay the card's next sibling
+  (`passwordRow`). It spans two grid rows through `subgrid`, so tiles line up across a row
+  whether or not they have a tray.
+- **Tile:** the track picture at the top with scanlines over it, the number and status on the
+  picture, the FINISHED sticker on its bottom edge (absolute, so it never changes a tile's
+  height). Number and status are absolute within the card; DOM order is unchanged.
+- **Cursor:** blinking corner brackets (`.level-card::before`, `--cursor-color`: sunset, hot on
+  a level that cannot be joined), the other tiles dim (`:has(.is-selected)`). It starts on
+  Level 1 or the last level chosen, except on touch screens. `moveGridCursor`: Left / Right go
+  through the levels in order, Up / Down along a column, all wrapping. Columns are read from the
+  grid's computed style, so it follows the window.
 
 ## Server Status (Level Select)
 Level cards are not hard-coded Online/Offline. While Level Select is open, `script.js` polls
