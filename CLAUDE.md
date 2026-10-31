@@ -117,7 +117,9 @@ landing screen that waits for one:
   buttons and links out of the site are skipped (window.open for sign-in needs that press);
   menu links, the page itself and the arrow keys go back. Esc never does. Going back on an arrow
   key still moves the cursor, unless the mouse rests on a tile: the layout change re-selects
-  whatever is under it.
+  whatever is under it. **Firefox** (user's test, 2026-10-31) does not hold full screen when the
+  car select appears, so it gets no hint (`IS_FIREFOX`, user agent check); the next press still
+  goes back.
 - **Sound panel** (the speaker button, top right): Music and Effects sliders (0-100) and Mute
   All. Loudness = (slider / 100)^2, so the defaults `DEFAULT_MUSIC_LEVEL` 25 and
   `DEFAULT_SFX_LEVEL` 60 (top of `script.js`) are 0.06 and 0.36. Slider positions are saved in

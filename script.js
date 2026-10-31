@@ -1051,6 +1051,7 @@ window.addEventListener('load', () => {
   const JOIN_DROP_MS = 1000;
   const JOIN_HINT_MS = 12000;
   const RETURN_KEYS = ['ArrowUp', 'ArrowDown', 'ArrowLeft', 'ArrowRight', 'Enter', 'Backspace'];
+  const IS_FIREFOX = navigator.userAgent.includes('Firefox'); // ticking the box does not hold full screen there
   let joinedFromFullscreenAt = null;
   let returnToFullscreen = false;
 
@@ -1065,6 +1066,7 @@ window.addEventListener('load', () => {
     joinedFromFullscreenAt = null;
     if (!droppedByJoin) return;
     returnToFullscreen = true;
+    if (IS_FIREFOX) return;
     showToast('Tick "Always allow" in the browser\'s box to stay in full screen next time.', false,
       { bottom: true, duration: JOIN_HINT_MS });
   };
