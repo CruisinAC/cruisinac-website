@@ -27,7 +27,7 @@ const VALID_VIEWS = [
   'start', 'level-select', 'leaderboard', 'credits',
   'options', 'about', 'how-to-play', 'controls', 'rules', 'downloads',
 ];
-// Where Back / Esc goes from each view: one level up the menus.
+// Where Back / Backspace goes from each view: one level up the menus.
 const VIEW_PARENT = {
   'level-select': 'start',
   leaderboard: 'start',
@@ -284,7 +284,7 @@ window.addEventListener('load', () => {
     });
   }
 
-  // Close the panel on a click elsewhere or Esc (Esc then does not also leave the page).
+  // Close the panel on a click elsewhere or Esc.
   document.addEventListener('pointerdown', (event) => {
     if (soundPanelOpen() && !event.target.closest('#soundPanel, #muteToggle')) setSoundPanelOpen(false);
   });
@@ -1092,7 +1092,7 @@ window.addEventListener('load', () => {
 
   // ---- Menu cursor and sounds ----
   // Arcade-style menus: Up/Down moves a highlighted cursor (the mouse moves it too),
-  // Enter confirms, Esc/Backspace goes back. The highlighted item is also the focused one,
+  // Enter confirms, Backspace goes back. The highlighted item is also the focused one,
   // so Tab and screen readers stay in step with it.
 
   const startMenuItems = startGate ? [...startGate.querySelectorAll('.start-menu__item')] : [];
@@ -1242,15 +1242,15 @@ window.addEventListener('load', () => {
   // The key hints along the bottom of the screen, per view (hidden on touch screens).
   const KEY_LEGENDS = {
     start: [['\u2191\u2193', 'Select'], ['Enter', 'Confirm']],
-    'level-select': [['\u2190\u2191\u2193\u2192', 'Select'], ['Enter', 'Join'], ['Esc', 'Back']],
-    leaderboard: [['\u2190\u2192', 'Level'], ['Esc', 'Back']],
-    credits: [['Esc', 'Back']],
-    options: [['\u2191\u2193', 'Select'], ['Enter', 'Confirm'], ['Esc', 'Back']],
-    about: [['Esc', 'Back']],
-    'how-to-play': [['Esc', 'Back']],
-    controls: [['Esc', 'Back']],
-    rules: [['Esc', 'Back']],
-    downloads: [['Esc', 'Back']],
+    'level-select': [['\u2190\u2191\u2193\u2192', 'Select'], ['Enter', 'Join'], ['Backspace', 'Back']],
+    leaderboard: [['\u2190\u2192', 'Level'], ['Backspace', 'Back']],
+    credits: [['Backspace', 'Back']],
+    options: [['\u2191\u2193', 'Select'], ['Enter', 'Confirm'], ['Backspace', 'Back']],
+    about: [['Backspace', 'Back']],
+    'how-to-play': [['Backspace', 'Back']],
+    controls: [['Backspace', 'Back']],
+    rules: [['Backspace', 'Back']],
+    downloads: [['Backspace', 'Back']],
   };
 
   const renderKeyLegend = () => {
@@ -1274,7 +1274,8 @@ window.addEventListener('load', () => {
     if (event.target.closest && event.target.closest('select, input, textarea, #soundPanel, #accountPanel')) return;
     if (event.key === 'Enter' && event.target.closest && event.target.closest('#muteToggle, #fullscreenToggle, #accountButton, .level-password')) return;
 
-    if (event.key === 'Escape' || event.key === 'Backspace') {
+    // Not Esc: browsers keep that for leaving full screen, and a page cannot share it reliably.
+    if (event.key === 'Backspace') {
       if (currentView && currentView !== 'start') {
         event.preventDefault();
         Sfx.back();

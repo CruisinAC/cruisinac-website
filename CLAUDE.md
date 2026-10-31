@@ -151,7 +151,9 @@ landing screen that waits for one:
   of these yet (2026-10-10); they are to be adjusted or replaced later, not removed.
 - **Keyboard menus** (`script.js`, "Menu cursor and sounds"): Up/Down moves a highlighted
   cursor on the title menu, all four arrows on the Level Select grid (mouse hover moves it too), Enter confirms,
-  Esc/Backspace goes back, Left/Right changes level on the Leaderboard. Returning to the title
+  Backspace goes back (not Esc since 2026-10-31: browsers keep Esc for leaving full screen, the
+  two collided, and Keyboard Lock, the way round it, is Chrome/Edge only; Esc still closes the
+  sound and account panels), Left/Right changes level on the Leaderboard. Returning to the title
   menu puts the cursor on the item you came from. A key-hint bar (`#keyLegend`) shows the keys
   per view, hidden on touch screens.
 
@@ -165,7 +167,7 @@ pages: **About** (`#about`), **How to Play** (`#how-to-play`), **Controls** (`#c
 Planned content for Downloads / Installation: links to the sites where players download the
 cars and tracks.
 
-Navigation: `VIEW_PARENT` at the top of `script.js` says where Back / Esc goes from each view
+Navigation: `VIEW_PARENT` at the top of `script.js` says where Back / Backspace goes from each view
 (a page -> Options -> title menu). Coming back to a menu puts the cursor on the item you left.
 A new view needs: a `<section class="view" data-view="...">`, an entry in `VALID_VIEWS` and
 `VIEW_PARENT`, and a line in `KEY_LEGENDS`.
