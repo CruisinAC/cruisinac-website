@@ -929,6 +929,18 @@ dd {
   border-color: rgba(255, 108, 108, 0.6);
 }
 
+/* The join hint: bottom centre, clear of the browser's box at the top of the page */
+.account-toast.is-bottom {
+  top: auto;
+  bottom: 64px;
+  left: 0;
+  right: 0;
+  width: fit-content;
+  max-width: min(560px, calc(100vw - 40px));
+  margin: 0 auto;
+  text-align: center;
+}
+
 /* Room above the page panels for the corner buttons */
 body .page {
   padding-top: 76px;

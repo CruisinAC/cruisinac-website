@@ -105,6 +105,19 @@ landing screen that waits for one:
   Fullscreen API on the whole page, so it only works from a real click. Esc or F11 also leaves
   full screen and the icon follows. Hidden where the browser cannot do it (iPhone Safari only
   allows video full screen).
+  **Joining from full screen (2026-10-31):** measured in Edge 156, the browser's "Open Content
+  Manager?" box is what drops page full screen, not the other window: with the link already
+  allowed, full screen held with an app opening on top, and the user confirmed it with the real
+  car select. F11 holds even through the box, but a page cannot trigger F11. A page cannot skip
+  the box or go back by itself (requestFullscreen was refused 1 s later: no fresh press). So
+  (`script.js`, right after "Full screen"): a drop within `JOIN_DROP_MS` (1 s) of a join shows
+  the "Always allow" hint for `JOIN_HINT_MS` (12 s), bottom centre (`.account-toast.is-bottom`)
+  so the box at the top does not cover it, and the next press goes back to full screen. Players
+  who ticked the box never see any of it. requestFullscreen uses up the press, so joining,
+  buttons and links out of the site are skipped (window.open for sign-in needs that press);
+  menu links, the page itself and the arrow keys go back. Esc never does. Going back on an arrow
+  key still moves the cursor, unless the mouse rests on a tile: the layout change re-selects
+  whatever is under it.
 - **Sound panel** (the speaker button, top right): Music and Effects sliders (0-100) and Mute
   All. Loudness = (slider / 100)^2, so the defaults `DEFAULT_MUSIC_LEVEL` 25 and
   `DEFAULT_SFX_LEVEL` 60 (top of `script.js`) are 0.06 and 0.36. Slider positions are saved in

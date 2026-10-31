@@ -694,13 +694,14 @@ window.addEventListener('load', () => {
 
   const apiFetch = (path, options = {}) => fetch(`${API_BASE_URL}${path}`, { credentials: 'include', ...options });
 
-  const showToast = (text, isError = false) => {
+  const showToast = (text, isError = false, { bottom = false, duration = 5000 } = {}) => {
     if (!accountToast) return;
     accountToast.textContent = text;
     accountToast.classList.toggle('is-error', isError);
+    accountToast.classList.toggle('is-bottom', bottom);
     accountToast.hidden = false;
     window.clearTimeout(toastTimer);
-    toastTimer = window.setTimeout(() => { accountToast.hidden = true; }, 5000);
+    toastTimer = window.setTimeout(() => { accountToast.hidden = true; }, duration);
   };
 
   const loadProgress = async () => {
@@ -1041,6 +1042,52 @@ window.addEventListener('load', () => {
     document.addEventListener('webkitfullscreenchange', syncFullscreenButton);
   }
 
+  // Joining a level: the browser's "Open Content Manager?" box drops full screen, the other
+  // window does not. Once the player ticks "Always allow" the box stops appearing and full
+  // screen holds. A page cannot skip the box or go back by itself, so only a drop right after
+  // a join gets the hint (players who ticked the box never see it), and the next press goes
+  // back. requestFullscreen uses up the press, so presses that need it themselves (joining,
+  // sign-in, links out of the site, Copy) are left alone and the one after goes back.
+  const JOIN_DROP_MS = 1000;
+  const JOIN_HINT_MS = 12000;
+  const RETURN_KEYS = ['ArrowUp', 'ArrowDown', 'ArrowLeft', 'ArrowRight', 'Enter', 'Backspace'];
+  let joinedFromFullscreenAt = null;
+  let returnToFullscreen = false;
+
+  const noteFullscreenChange = () => {
+    if (fullscreenElement()) {
+      returnToFullscreen = false;
+      if (accountToast.classList.contains('is-bottom')) accountToast.hidden = true;
+      return;
+    }
+    const droppedByJoin = joinedFromFullscreenAt !== null
+      && performance.now() - joinedFromFullscreenAt < JOIN_DROP_MS;
+    joinedFromFullscreenAt = null;
+    if (!droppedByJoin) return;
+    returnToFullscreen = true;
+    showToast('Tick "Always allow" in the browser\'s box to stay in full screen next time.', false,
+      { bottom: true, duration: JOIN_HINT_MS });
+  };
+
+  const goBackToFullscreen = (event) => {
+    if (!returnToFullscreen) return;
+    const isKey = event.type === 'keydown';
+    if (isKey && (!RETURN_KEYS.includes(event.key) || event.altKey || event.ctrlKey || event.metaKey)) return;
+    const pressesTarget = !isKey || event.key === 'Enter';
+    const element = isKey && event.key === 'Enter' ? selected || event.target : event.target;
+    const leaveAlone = pressesTarget ? 'button, input, select, textarea, a[href]:not([data-view-link])' : 'input, select, textarea';
+    if (element.closest && element.closest(leaveAlone)) return;
+    returnToFullscreen = false;
+    toggleFullscreen();
+  };
+
+  if (canFullscreen) {
+    document.addEventListener('fullscreenchange', noteFullscreenChange);
+    document.addEventListener('webkitfullscreenchange', noteFullscreenChange);
+    window.addEventListener('click', goBackToFullscreen, true);
+    window.addEventListener('keydown', goBackToFullscreen, true);
+  }
+
   // ---- Menu cursor and sounds ----
   // Arcade-style menus: Up/Down moves a highlighted cursor (the mouse moves it too),
   // Enter confirms, Esc/Backspace goes back. The highlighted item is also the focused one,
@@ -1170,6 +1217,7 @@ window.addEventListener('load', () => {
       } else {
         Sfx.select();
         flash(card, 'is-launching', 900);
+        if (fullscreenElement()) joinedFromFullscreenAt = performance.now();
       }
     });
   });
