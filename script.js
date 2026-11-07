@@ -103,13 +103,14 @@ const SERVER_STATUS_REFRESH_MS = 15000;
 const LEVELS = [
   { number: 1, name: 'Myogi Downhill', short: 'Myogi', track: 'ek_myogi-downhill_idas' },
   { number: 2, name: 'Momiji Line Downhill', short: 'Momiji', track: 'ek_momiji-downhill_idas' },
-  { number: 3, name: 'Tsukuba Fruits Line Outbound', short: 'Tsukuba', track: 'ek_tsukuba_fruits_line-outbound_idas' },
-  { number: 4, name: 'Mt Akina Downhill', short: 'Akina', track: 'ek_akina-downhill_idas' },
-  { number: 5, name: 'Tsubaki Line Downhill', short: 'Tsubaki', track: 'ek_tsubaki_line-downhill_idas' },
-  { number: 6, name: 'Irohazaka Downhill', short: 'Irohazaka', track: 'ek_irohazaka-downhill_idas' },
+  { number: 3, name: 'Akagi Downhill', short: 'Akagi', track: 'ek_akagi-downhill_idas' },
+  { number: 4, name: 'Tsukuba Fruits Line Outbound', short: 'Tsukuba', track: 'ek_tsukuba_fruits_line-outbound_idas' },
+  { number: 5, name: 'Mt Akina Downhill', short: 'Akina', track: 'ek_akina-downhill_idas' },
+  { number: 6, name: 'Tsubaki Line Downhill', short: 'Tsubaki', track: 'ek_tsubaki_line-downhill_idas' },
+  { number: 7, name: 'Irohazaka Downhill', short: 'Irohazaka', track: 'ek_irohazaka-downhill_idas' },
 ];
-// Level shown when the leaderboard opens: the only one running the plugin so far.
-const DEFAULT_LEADERBOARD_LEVEL = 6;
+// Level shown when the leaderboard opens (Irohazaka, the first level to run the plugin).
+const DEFAULT_LEADERBOARD_LEVEL = 7;
 
 // The two boards the API offers (`sort=`): score (highest first, a tie goes to the faster
 // time) and time (fastest first, a tie goes to whoever set it first).
@@ -1170,14 +1171,8 @@ window.addEventListener('load', () => {
     select(next, { direction });
   };
 
-  // Level Select is a grid with as many columns as fit (CSS auto-fill), so ask the browser.
-  const levelGridColumns = () => {
-    const grid = document.querySelector('.level-select');
-    return window.getComputedStyle(grid).gridTemplateColumns.split(' ').length;
-  };
-
-  // Left / Right step through the levels in order, Up / Down move along a column; all wrap.
-  // The last row can be short, so moving down from above a gap lands on the last level.
+  // Level Select is a starting grid: two staggered columns, but the levels are one list in
+  // order, so Down / Right go to the next level and Up / Left to the previous, wrapping.
   const moveGridCursor = (key) => {
     const items = [...levelCards];
     const index = items.indexOf(selected);
@@ -1185,24 +1180,15 @@ window.addEventListener('load', () => {
       select(items[0]);
       return;
     }
-    const last = items.length - 1;
-    const columns = levelGridColumns();
-    let next;
-    if (key === 'ArrowRight') {
-      next = index === last ? 0 : index + 1;
-    } else if (key === 'ArrowLeft') {
-      next = index === 0 ? last : index - 1;
-    } else if (key === 'ArrowDown') {
-      if (index + columns <= last) next = index + columns;
-      else if (Math.floor(index / columns) < Math.floor(last / columns)) next = last;
-      else next = index % columns;
-    } else {
-      next = index - columns >= 0
-        ? index - columns
-        : Math.min(last - (last % columns) + (index % columns), last);
-    }
-    select(items[next], { direction: key === 'ArrowRight' || key === 'ArrowDown' ? 1 : -1 });
+    const direction = key === 'ArrowDown' || key === 'ArrowRight' ? 1 : -1;
+    select(items[(index + direction + items.length) % items.length], { direction });
   };
+
+  // Each level starts one half-row below the one before it, alternating columns (styles.css,
+  // "Starting grid"); its row is its place in the list, so new levels need no CSS changes.
+  document.querySelectorAll('.level-select .level-slot').forEach((slot, i) => {
+    slot.style.setProperty('--grid-row', String(i + 1));
+  });
 
   // Mouse hover moves the cursor (not touch: a tap would blip and confirm at once).
   [...startMenuItems, ...optionsMenuItems, ...levelCards].forEach((item) => {
@@ -1261,7 +1247,7 @@ window.addEventListener('load', () => {
   // The key hints along the bottom of the screen, per view (hidden on touch screens).
   const KEY_LEGENDS = {
     start: [['\u2191\u2193', 'Select'], ['Enter', 'Confirm']],
-    'level-select': [['\u2190\u2191\u2193\u2192', 'Select'], ['Enter', 'Join'], ['Backspace', 'Back']],
+    'level-select': [['\u2191\u2193', 'Select'], ['Enter', 'Join'], ['Backspace', 'Back']],
     leaderboard: [['\u2190\u2192', 'Level'], ['Backspace', 'Back']],
     credits: [['Backspace', 'Back']],
     options: [['\u2191\u2193', 'Select'], ['Enter', 'Confirm'], ['Backspace', 'Back']],

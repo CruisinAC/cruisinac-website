@@ -343,21 +343,37 @@ h3 {
   border: 1px dashed rgba(255, 255, 255, 0.18);
 }
 
-/* Arcade course grid: as many columns as fit (3 on a desktop), new levels start a new row */
+/* Starting grid: two staggered columns, Level 1 in the top left (pole). Each level is two
+   half-rows tall and starts one half-row below the level before it (--grid-row, set by
+   script.js from its place in the list), alternating columns, so the right column sits half a
+   tile lower. One column, in order, when two do not fit. */
 .level-select {
   display: grid;
-  grid-template-columns: repeat(auto-fill, minmax(min(290px, 100%), 1fr));
-  column-gap: 20px;
+  grid-template-columns: repeat(2, minmax(0, 440px));
+  justify-content: center;
+  column-gap: 40px;
 }
-
-/* A tile and its password tray (script.js adds the tray right after the card). Two rows
-   shared across the grid, so tiles line up whether or not their neighbours have a tray. */
 .level-slot {
   display: grid;
-  grid-row: span 2;
-  grid-template-rows: subgrid;
+  grid-template-rows: auto auto;
+  align-content: start;
+  grid-row: var(--grid-row, auto) / span 2;
+  grid-column: 1;
   min-width: 0;
   padding-bottom: 20px;
+}
+.level-slot:nth-child(even) {
+  grid-column: 2;
+}
+@media (max-width: 640px) {
+  .level-select {
+    grid-template-columns: minmax(0, 1fr);
+  }
+  .level-slot,
+  .level-slot:nth-child(even) {
+    grid-row: auto;
+    grid-column: 1;
+  }
 }
 
 .level-select__header {

@@ -281,26 +281,36 @@ against a test copy of the API on port 8001 (started with `PUBLIC_API_URL=http:/
 `http://localhost:5500/?api=8001`: on localhost, `?api=<port>` points that browser tab at
 another API port (kept in `sessionStorage`).
 
-## Level Select Grid (2026-10-30)
-An arcade course-select screen instead of the old vertical list: three tiles across on a
-desktop, two rows for the six levels. The columns are CSS `auto-fill` (minimum tile width
-290px), so a window gets as many as fit (2 on a tablet, 1 on a phone) and new levels simply
-start a new row.
+## Level Select Grid (starting grid since 2026-11-07)
+First an arcade course grid (2026-10-30: `auto-fill` columns, three across); since 2026-11-07 a
+starting grid (the user's design): two staggered columns, Level 1 in the top-left slot (pole),
+Level 2 in the right column half a tile lower, Level 3 under Level 1, and so on. Each level is
+two half-rows tall (`grid-row: var(--grid-row) / span 2`) and starts one half-row below the
+level before it; `script.js` sets `--grid-row` from each slot's place in the list, odd slots go
+in column 1 and even in column 2 (`:nth-child`), so a new level needs no CSS change. Columns are
+up to 440px, 40px apart, centred. At 640px and below: one column, in order, no offset.
 
 - **Adding a level:** copy a whole `.level-slot` block in `index.html`, change the rank badge
-  (its number is how `cardLevel` finds the level), pictures, name and text, and add it to
-  `LEVELS` in `script.js`. No layout changes needed; tested with seven.
+  (its number is how `cardLevel` finds the level), pictures, name and text, renumber the badges
+  after it, and add it to `LEVELS` in `script.js`. Pictures are the game's own
+  `content/tracks/<track>/ui/<layout>/preview.png` and `outline.png`, named after the track
+  without a level number (`assets/images/tracks/akagi-downhill.png`, `...-outline.png`), so
+  reordering levels needs no renames. The level order itself lives in the API's
+  `game_servers.json`; the badges and `LEVELS` here must match it (deploy them together).
 - **`.level-slot`** wraps each card because the password tray must stay the card's next sibling
-  (`passwordRow`). It spans two grid rows through `subgrid`, so tiles line up across a row
-  whether or not they have a tray.
+  (`passwordRow`): rows `auto auto`, card then tray.
 - **Tile:** the track picture at the top with scanlines over it, the number and status on the
   picture, the FINISHED sticker on its bottom edge (absolute, so it never changes a tile's
   height). Number and status are absolute within the card; DOM order is unchanged.
 - **Cursor:** blinking corner brackets (`.level-card::before`, `--cursor-color`: sunset, hot on
   a level that cannot be joined), the other tiles dim (`:has(.is-selected)`). It starts on
-  Level 1 or the last level chosen, except on touch screens. `moveGridCursor`: Left / Right go
-  through the levels in order, Up / Down along a column, all wrapping. Columns are read from the
-  grid's computed style, so it follows the window.
+  Level 1 or the last level chosen, except on touch screens. `moveGridCursor`: the levels are one
+  list in order whatever the layout: Down / Right = next, Up / Left = previous, wrapping (the key
+  hint shows Up / Down only).
+- **Card lines (2026-11-07):** Akagi "The steepest drop yet, hairpin after hairpin." (7.3%
+  average grade, 413 m drop, 16 hairpins), Tsubaki "Bend after tight bend, barely a straight to
+  breathe." (34 bends under 40 m radius, longest straight 105 m), Irohazaka "Nineteen stacked
+  hairpins. The final test." (19 hairpins in 4.9 km). Drafts for the user to check.
 
 ## Server Status (Level Select)
 Level cards are not hard-coded Online/Offline. While Level Select is open, `script.js` polls
