@@ -296,10 +296,9 @@ with a "?", dashed border). They are not `.level-card`s, so they get no status, 
 cursor, and Up / Down skip a band without level cards. Replace a tile with a real `.level-slot` when
 an Extreme level arrives; remove the tiles once the band is full.
 
-Tiers as of 2026-11-07: **Easy** Myogi, Momiji, Akagi; **Medium** Tsukuba Fruits Line, Akina (and
-Sadamine, the next level to come); **Hard** Tsubaki Line, Irohazaka. Planned: Tsubaki and Irohazaka
+Tiers as of 2026-11-08: **Easy** Myogi, Momiji, Akagi; **Medium** Tsukuba Fruits Line, Sadamine, Akina; **Hard** Tsubaki Line, Irohazaka. Planned: Tsubaki and Irohazaka
 move to Extreme with Happogahara, and Hakone Turnpike, Nagao and Nanamagari join Hard.
-The bands follow the level order (the level numbers run 01-07 across them), so the tier a level is
+The bands follow the level order (the level numbers run 01-08 across them), so the tier a level is
 in is where its `.level-slot` sits in `index.html`. Keys (`moveGridCursor`, the user's choice):
 Right / Left go through all levels in order, across bands; Down / Up jump to the band below /
 above, to its card nearest the current one horizontally (the first on a tie, so on a phone the
@@ -327,7 +326,8 @@ band's first card). Both wrap.
 - **Card lines (2026-11-07):** Akagi "The steepest drop yet, hairpin after hairpin." (7.3%
   average grade, 413 m drop, 16 hairpins), Tsubaki "Bend after tight bend, barely a straight to
   breathe." (34 bends under 40 m radius, longest straight 105 m), Irohazaka "Nineteen stacked
-  hairpins. The final test." (19 hairpins in 4.9 km). Drafts for the user to check.
+  hairpins. The final test." (19 hairpins in 4.9 km), Sadamine (2026-11-08) "A narrow ribbon of road through twenty-nine tight
+  bends." (6.6 km, 29 bends under 40 m radius, a 3 m road by its `ui_track.json`). Drafts for the user to check.
 
 ## Server Status (Level Select)
 Level cards are not hard-coded Online/Offline. While Level Select is open, `script.js` polls
