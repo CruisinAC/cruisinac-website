@@ -1171,8 +1171,9 @@ window.addEventListener('load', () => {
     select(next, { direction });
   };
 
-  // Level Select groups the levels by difficulty tier, but they are one list in order:
-  // Down / Right go to the next level and Up / Left to the previous, across tiers, wrapping.
+  // Level Select groups the levels by difficulty tier. Right / Left go to the next / previous
+  // level in order, across tiers; Down / Up jump to the tier below / above, to the card there
+  // nearest the current one horizontally (the first one on a tie). Both wrap.
   const moveGridCursor = (key) => {
     const items = [...levelCards];
     const index = items.indexOf(selected);
@@ -1181,7 +1182,23 @@ window.addEventListener('load', () => {
       return;
     }
     const direction = key === 'ArrowDown' || key === 'ArrowRight' ? 1 : -1;
-    select(items[(index + direction + items.length) % items.length], { direction });
+    if (key === 'ArrowLeft' || key === 'ArrowRight') {
+      select(items[(index + direction + items.length) % items.length], { direction });
+      return;
+    }
+    const tiers = [...document.querySelectorAll('.level-select .level-tier')]
+      .filter((tier) => tier.querySelector('.level-card'));
+    const here = tiers.indexOf(selected.closest('.level-tier'));
+    const target = tiers[(here + direction + tiers.length) % tiers.length];
+    const centre = (card) => {
+      const box = card.getBoundingClientRect();
+      return box.left + box.width / 2;
+    };
+    const x = centre(selected);
+    const cards = [...target.querySelectorAll('.level-card')];
+    const nearest = cards.reduce((best, card) =>
+      Math.abs(centre(card) - x) < Math.abs(centre(best) - x) ? card : best);
+    select(nearest, { direction });
   };
 
   // Mouse hover moves the cursor (not touch: a tap would blip and confirm at once).
@@ -1241,7 +1258,7 @@ window.addEventListener('load', () => {
   // The key hints along the bottom of the screen, per view (hidden on touch screens).
   const KEY_LEGENDS = {
     start: [['\u2191\u2193', 'Select'], ['Enter', 'Confirm']],
-    'level-select': [['\u2191\u2193', 'Select'], ['Enter', 'Join'], ['Backspace', 'Back']],
+    'level-select': [['\u2190\u2191\u2193\u2192', 'Select'], ['Enter', 'Join'], ['Backspace', 'Back']],
     leaderboard: [['\u2190\u2192', 'Level'], ['Backspace', 'Back']],
     credits: [['Backspace', 'Back']],
     options: [['\u2191\u2193', 'Select'], ['Enter', 'Confirm'], ['Backspace', 'Back']],

@@ -297,8 +297,10 @@ Tiers as of 2026-11-07: **Easy** Myogi, Momiji, Akagi; **Medium** Tsukuba Fruits
 Sadamine, the next level to come); **Hard** Tsubaki Line, Irohazaka. Planned: Tsubaki and Irohazaka
 move to Extreme with Happogahara, and Hakone Turnpike, Nagao and Nanamagari join Hard.
 The bands follow the level order (the level numbers run 01-07 across them), so the tier a level is
-in is where its `.level-slot` sits in `index.html`. Up / Down still go through all levels in order,
-across bands (`moveGridCursor`).
+in is where its `.level-slot` sits in `index.html`. Keys (`moveGridCursor`, the user's choice):
+Right / Left go through all levels in order, across bands; Down / Up jump to the band below /
+above, to its card nearest the current one horizontally (the first on a tie, so on a phone the
+band's first card). Both wrap.
 
 - **Adding a level:** copy a whole `.level-slot` block into its tier's `.level-tier__levels` in
   `index.html` (a new tier: copy a whole `.level-tier` section and change its class and name), change the rank badge
@@ -316,9 +318,9 @@ across bands (`moveGridCursor`).
   height). Number and status are absolute within the card; DOM order is unchanged.
 - **Cursor:** blinking corner brackets (`.level-card::before`, `--cursor-color`: sunset, hot on
   a level that cannot be joined), the other tiles dim (`:has(.is-selected)`). It starts on
-  Level 1 or the last level chosen, except on touch screens. `moveGridCursor`: the levels are one
-  list in order across the tiers: Down / Right = next, Up / Left = previous, wrapping (the key
-  hint shows Up / Down only).
+  Level 1 or the last level chosen, except on touch screens. `moveGridCursor`: Right / Left =
+  next / previous level in order, Down / Up = the next / previous tier (see above); the key hint
+  shows all four arrows.
 - **Card lines (2026-11-07):** Akagi "The steepest drop yet, hairpin after hairpin." (7.3%
   average grade, 413 m drop, 16 hairpins), Tsubaki "Bend after tight bend, barely a straight to
   breathe." (34 bends under 40 m radius, longest straight 105 m), Irohazaka "Nineteen stacked
