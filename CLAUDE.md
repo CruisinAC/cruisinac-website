@@ -290,8 +290,11 @@ with a heading (`.level-tier__name`, the tier's colour, and `.level-tier__meter`
 bars, 1 lit for Easy, 2 Medium, 3 Hard, 4 Extreme) over `.level-tier__levels`, an `auto-fill`
 grid of its tiles (up to three across on a desktop, one on a phone). Each tile gets a 3px top
 stripe in its tier's colour. Colours: Easy green `#4fe08a`, Medium `--sunset`, Hard `--hot`,
-**Extreme purple `#c46bff`** (the user wants the tier after Hard purple; the CSS for it exists, no
-band uses it yet).
+**Extreme purple `#c46bff`** (the user wants the tier after Hard purple). The Extreme band is shown
+with three "Coming soon" tiles (`.level-soon`: the size of a level tile, striped purple picture area
+with a "?", dashed border). They are not `.level-card`s, so they get no status, no join link and no
+cursor, and Up / Down skip a band without level cards. Replace a tile with a real `.level-slot` when
+an Extreme level arrives; remove the tiles once the band is full.
 
 Tiers as of 2026-11-07: **Easy** Myogi, Momiji, Akagi; **Medium** Tsukuba Fruits Line, Akina (and
 Sadamine, the next level to come); **Hard** Tsubaki Line, Irohazaka. Planned: Tsubaki and Irohazaka
