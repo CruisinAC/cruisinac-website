@@ -281,16 +281,27 @@ against a test copy of the API on port 8001 (started with `PUBLIC_API_URL=http:/
 `http://localhost:5500/?api=8001`: on localhost, `?api=<port>` points that browser tab at
 another API port (kept in `sessionStorage`).
 
-## Level Select Grid (starting grid since 2026-11-07)
-First an arcade course grid (2026-10-30: `auto-fill` columns, three across); since 2026-11-07 a
-starting grid (the user's design): two staggered columns, Level 1 in the top-left slot (pole),
-Level 2 in the right column half a tile lower, Level 3 under Level 1, and so on. Each level is
-two half-rows tall (`grid-row: var(--grid-row) / span 2`) and starts one half-row below the
-level before it; `script.js` sets `--grid-row` from each slot's place in the list, odd slots go
-in column 1 and even in column 2 (`:nth-child`), so a new level needs no CSS change. Columns are
-up to 440px, 40px apart, centred. At 640px and below: one column, in order, no offset.
+## Level Select by Difficulty Tier (2026-11-07)
+History: an arcade course grid (2026-10-30, `auto-fill` columns), then briefly a staggered
+starting grid (2026-11-07, rejected: tiles packed too tight, and a starting grid does not suit a
+checkpoint drifting game). Now the levels are grouped into difficulty tiers (the user's design):
+one `<section class="level-tier level-tier--<tier>">` band per tier inside `.level-select`, each
+with a heading (`.level-tier__name`, the tier's colour, and `.level-tier__meter`: four slanted
+bars, 1 lit for Easy, 2 Medium, 3 Hard, 4 Extreme) over `.level-tier__levels`, an `auto-fill`
+grid of its tiles (up to three across on a desktop, one on a phone). Each tile gets a 3px top
+stripe in its tier's colour. Colours: Easy green `#4fe08a`, Medium `--sunset`, Hard `--hot`,
+**Extreme purple `#c46bff`** (the user wants the tier after Hard purple; the CSS for it exists, no
+band uses it yet).
 
-- **Adding a level:** copy a whole `.level-slot` block in `index.html`, change the rank badge
+Tiers as of 2026-11-07: **Easy** Myogi, Momiji, Akagi; **Medium** Tsukuba Fruits Line, Akina (and
+Sadamine, the next level to come); **Hard** Tsubaki Line, Irohazaka. Planned: Tsubaki and Irohazaka
+move to Extreme with Happogahara, and Hakone Turnpike, Nagao and Nanamagari join Hard.
+The bands follow the level order (the level numbers run 01-07 across them), so the tier a level is
+in is where its `.level-slot` sits in `index.html`. Up / Down still go through all levels in order,
+across bands (`moveGridCursor`).
+
+- **Adding a level:** copy a whole `.level-slot` block into its tier's `.level-tier__levels` in
+  `index.html` (a new tier: copy a whole `.level-tier` section and change its class and name), change the rank badge
   (its number is how `cardLevel` finds the level), pictures, name and text, renumber the badges
   after it, and add it to `LEVELS` in `script.js`. Pictures are the game's own
   `content/tracks/<track>/ui/<layout>/preview.png` and `outline.png`, named after the track
@@ -298,14 +309,15 @@ up to 440px, 40px apart, centred. At 640px and below: one column, in order, no o
   reordering levels needs no renames. The level order itself lives in the API's
   `game_servers.json`; the badges and `LEVELS` here must match it (deploy them together).
 - **`.level-slot`** wraps each card because the password tray must stay the card's next sibling
-  (`passwordRow`): rows `auto auto`, card then tray.
+  (`passwordRow`). It spans two rows of its tier's grid through `subgrid`, so tiles in a row line
+  up whether or not they have a tray.
 - **Tile:** the track picture at the top with scanlines over it, the number and status on the
   picture, the FINISHED sticker on its bottom edge (absolute, so it never changes a tile's
   height). Number and status are absolute within the card; DOM order is unchanged.
 - **Cursor:** blinking corner brackets (`.level-card::before`, `--cursor-color`: sunset, hot on
   a level that cannot be joined), the other tiles dim (`:has(.is-selected)`). It starts on
   Level 1 or the last level chosen, except on touch screens. `moveGridCursor`: the levels are one
-  list in order whatever the layout: Down / Right = next, Up / Left = previous, wrapping (the key
+  list in order across the tiers: Down / Right = next, Up / Left = previous, wrapping (the key
   hint shows Up / Down only).
 - **Card lines (2026-11-07):** Akagi "The steepest drop yet, hairpin after hairpin." (7.3%
   average grade, 413 m drop, 16 hairpins), Tsubaki "Bend after tight bend, barely a straight to

@@ -1171,8 +1171,8 @@ window.addEventListener('load', () => {
     select(next, { direction });
   };
 
-  // Level Select is a starting grid: two staggered columns, but the levels are one list in
-  // order, so Down / Right go to the next level and Up / Left to the previous, wrapping.
+  // Level Select groups the levels by difficulty tier, but they are one list in order:
+  // Down / Right go to the next level and Up / Left to the previous, across tiers, wrapping.
   const moveGridCursor = (key) => {
     const items = [...levelCards];
     const index = items.indexOf(selected);
@@ -1183,12 +1183,6 @@ window.addEventListener('load', () => {
     const direction = key === 'ArrowDown' || key === 'ArrowRight' ? 1 : -1;
     select(items[(index + direction + items.length) % items.length], { direction });
   };
-
-  // Each level starts one half-row below the one before it, alternating columns (styles.css,
-  // "Starting grid"); its row is its place in the list, so new levels need no CSS changes.
-  document.querySelectorAll('.level-select .level-slot').forEach((slot, i) => {
-    slot.style.setProperty('--grid-row', String(i + 1));
-  });
 
   // Mouse hover moves the cursor (not touch: a tap would blip and confirm at once).
   [...startMenuItems, ...optionsMenuItems, ...levelCards].forEach((item) => {
