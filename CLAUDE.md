@@ -314,8 +314,10 @@ band's first card). Both wrap.
   after it, and add it to `LEVELS` in `script.js`. Pictures are the game's own
   `content/tracks/<track>/ui/<layout>/preview.png` and `outline.png`, named after the track
   without a level number (`assets/images/tracks/akagi-downhill.png`, `...-outline.png`), so
-  reordering levels needs no renames. Exception (the user's choice): Sadamine's preview comes from its `downhill_real`
-  layout, its outline from `downhill_idas`. The level order itself lives in the API's
+  reordering levels needs no renames. Exception (the user's choice): Sadamine's and Hakone Turnpike's previews
+  come from their `_real` layouts, their outlines from the `_idas` ones. `hakone-turnpike-downhill*.png` (for
+  its Level 7 card at go-live) and `hakone-turnpike-uphill*.png` (`uphill_real` / `uphill_idas`, for an uphill
+  card if one comes) were added 2026-11-08 ahead of the card. The level order itself lives in the API's
   `game_servers.json`; the badges and `LEVELS` here must match it (deploy them together).
 - **`.level-slot`** wraps each card because the password tray must stay the card's next sibling
   (`passwordRow`). It spans two rows of its tier's grid through `subgrid`, so tiles in a row line
