@@ -64,10 +64,14 @@ The third Credits section points players to the **Car Pack** at
 link, which would go stale). Keep the wording to "modded cars and traffic":
 
 - SRP distributes the pack but did not build these cars (the `ddm_` cars' author is ДЯДЯ ДИМА, the
-  traffic cars' Opperslang + Just Kauser), so the page must not say SRP made them.
+  traffic cars' Opperslang + Just Kauser, the two Hondas' RaptorJeezus and Seb/Amy), so the page must not say SRP made them.
 - Checked against the pack 3.6 file list on 2026-10-30: all six `traffic_*` cars and the
-  seven `ddm_*` / `p3_*` cars on the level servers are in it. `bmw_m3_e30_s1`,
-  `ks_toyota_ae86_tuned` and `ks_toyota_supra_mkiv` are NOT: they are official AC cars.
+  `ddm_*` / `p3_*` cars on the level servers are in it. `ks_toyota_ae86_tuned` and
+  `ks_toyota_supra_mkiv` are NOT: they are official AC cars.
+- **2026-11-08:** the front-wheel-drive `rj_honda_civic_eg6_tuned` (by RaptorJeezus) and
+  `amy_honda_dc2_turbo` (by Seb/Amy) replaced the official `bmw_m3_e30_s1` and
+  `ddm_toyota_supra_ma70` on every server. Both are in pack 3.6, and their `data.acd` is identical
+  to the servers' copies, so players with the pack pass the checksum.
 - The site does not say the pack is free, so the page does not either.
 
 ## Opening Sequence and Sound (2026-10-10)
