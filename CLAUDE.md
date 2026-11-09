@@ -294,15 +294,17 @@ with a heading (`.level-tier__name`, the tier's colour, and `.level-tier__meter`
 bars, 1 lit for Easy, 2 Medium, 3 Hard, 4 Extreme) over `.level-tier__levels`, an `auto-fill`
 grid of its tiles (up to three across on a desktop, one on a phone). Each tile gets a 3px top
 stripe in its tier's colour. Colours: Easy green `#4fe08a`, Medium `--sunset`, Hard `--hot`,
-**Extreme purple `#c46bff`** (the user wants the tier after Hard purple). The Extreme band is shown
-with three "Coming soon" tiles (`.level-soon`: the size of a level tile, striped purple picture area
+**Extreme purple `#c46bff`** (the user wants the tier after Hard purple). A band's free places are
+"Coming soon" tiles (`.level-soon`: the size of a level tile, striped picture area in the tier's colour
 with a "?", dashed border). They are not `.level-card`s, so they get no status, no join link and no
 cursor, and Up / Down skip a band without level cards. Replace a tile with a real `.level-slot` when
-an Extreme level arrives; remove the tiles once the band is full.
+a level for that tier arrives; remove the tiles once the band is full.
 
-Tiers as of 2026-11-08: **Easy** Myogi, Momiji, Akagi; **Medium** Tsukuba Fruits Line, Sadamine, Akina; **Hard** Tsubaki Line, Irohazaka. Planned: Tsubaki and Irohazaka
-move to Extreme with Happogahara, and Hakone Turnpike, Nagao and Nanamagari join Hard.
-The bands follow the level order (the level numbers run 01-08 across them), so the tier a level is
+Tiers as of 2026-11-08 (Hakone go-live): **Easy** Myogi, Momiji, Akagi; **Medium** Tsukuba Fruits Line,
+Sadamine, Akina; **Hard** Hakone Turnpike and two "Coming soon" tiles (`.level-soon` takes its tier's
+colour); **Extreme** Tsubaki Line, Irohazaka and one "Coming soon". Planned: Nagao and Nanamagari join
+Hard, Happogahara Extreme.
+The bands follow the level order (the level numbers run 01-09 across them), so the tier a level is
 in is where its `.level-slot` sits in `index.html`. Keys (`moveGridCursor`, the user's choice):
 Right / Left go through all levels in order, across bands; Down / Up jump to the band below /
 above, to its card nearest the current one horizontally (the first on a tie, so on a phone the
@@ -314,10 +316,10 @@ band's first card). Both wrap.
   after it, and add it to `LEVELS` in `script.js`. Pictures are the game's own
   `content/tracks/<track>/ui/<layout>/preview.png` and `outline.png`, named after the track
   without a level number (`assets/images/tracks/akagi-downhill.png`, `...-outline.png`), so
-  reordering levels needs no renames. Exception (the user's choice): Sadamine's and Hakone Turnpike's previews
-  come from their `_real` layouts, their outlines from the `_idas` ones. `hakone-turnpike-downhill*.png` (for
-  its Level 7 card at go-live) and `hakone-turnpike-uphill*.png` (`uphill_real` / `uphill_idas`, for an uphill
-  card if one comes) were added 2026-11-08 ahead of the card. The level order itself lives in the API's
+  reordering levels needs no renames. Exceptions (the user's choice): Sadamine's and Hakone Turnpike's previews
+  come from their `_real` layouts. Sadamine's outline is from `downhill_idas`; Hakone's from `_real` too,
+  because its `_idas` outlines carry an "Initial D Zero" logo. `hakone-turnpike-uphill*.png` (`uphill_real`)
+  is in the folder unused, for an uphill card if one comes. The level order itself lives in the API's
   `game_servers.json`; the badges and `LEVELS` here must match it (deploy them together).
 - **`.level-slot`** wraps each card because the password tray must stay the card's next sibling
   (`passwordRow`). It spans two rows of its tier's grid through `subgrid`, so tiles in a row line
@@ -334,7 +336,9 @@ band's first card). Both wrap.
   average grade, 413 m drop, 16 hairpins), Tsubaki "Bend after tight bend, barely a straight to
   breathe." (34 bends under 40 m radius, longest straight 105 m), Irohazaka "Nineteen stacked
   hairpins. The final test." (19 hairpins in 4.9 km), Sadamine (2026-11-08) "A narrow ribbon of road through twenty-nine tight
-  bends." (6.6 km, 29 bends under 40 m radius, a 3 m road by its `ui_track.json`). Drafts for the user to check.
+  bends." (6.6 km, 29 bends under 40 m radius, a 3 m road by its `ui_track.json`), Hakone Turnpike (2026-11-08)
+  "Eleven kilometres and 900 metres down, flat out through the sweepers." (10.8 km run, 912 m drop, no bend
+  under 25 m radius, racing line median 173 km/h). Drafts for the user to check.
 
 ## Server Status (Level Select)
 Level cards are not hard-coded Online/Offline. While Level Select is open, `script.js` polls

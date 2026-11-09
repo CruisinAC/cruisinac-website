@@ -107,11 +107,12 @@ const LEVELS = [
   { number: 4, name: 'Tsukuba Fruits Line Outbound', short: 'Tsukuba', track: 'ek_tsukuba_fruits_line-outbound_idas' },
   { number: 5, name: 'Sadamine Downhill', short: 'Sadamine', track: 'ek_sadamine-downhill_idas' },
   { number: 6, name: 'Mt Akina Downhill', short: 'Akina', track: 'ek_akina-downhill_idas' },
-  { number: 7, name: 'Tsubaki Line Downhill', short: 'Tsubaki', track: 'ek_tsubaki_line-downhill_idas' },
-  { number: 8, name: 'Irohazaka Downhill', short: 'Irohazaka', track: 'ek_irohazaka-downhill_idas' },
+  { number: 7, name: 'Hakone Turnpike Downhill', short: 'Hakone', track: 'ek_hakone_turnpike-downhill_idas' },
+  { number: 8, name: 'Tsubaki Line Downhill', short: 'Tsubaki', track: 'ek_tsubaki_line-downhill_idas' },
+  { number: 9, name: 'Irohazaka Downhill', short: 'Irohazaka', track: 'ek_irohazaka-downhill_idas' },
 ];
 // Level shown when the leaderboard opens (Irohazaka, the first level to run the plugin).
-const DEFAULT_LEADERBOARD_LEVEL = 8;
+const DEFAULT_LEADERBOARD_LEVEL = 9;
 
 // The two boards the API offers (`sort=`): score (highest first, a tie goes to the faster
 // time) and time (fastest first, a tie goes to whoever set it first).
