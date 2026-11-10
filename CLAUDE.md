@@ -300,11 +300,11 @@ with a "?", dashed border). They are not `.level-card`s, so they get no status, 
 cursor, and Up / Down skip a band without level cards. Replace a tile with a real `.level-slot` when
 a level for that tier arrives; remove the tiles once the band is full.
 
-Tiers as of 2026-11-08 (Tsuchisaka go-live): **Easy** Myogi, Momiji, Akagi; **Medium** Tsukuba Fruits Line,
-Sadamine, Akina; **Hard** Hakone Turnpike, Nagao Uphill, Tsuchisaka Inbound (full, no "Coming soon" tile);
-**Extreme** Tsubaki Line, Irohazaka and one "Coming soon" (`.level-soon` takes its tier's colour).
-Planned: Nanamagari needs a fourth Hard slot, Happogahara Extreme.
-The bands follow the level order (the level numbers run 01-11 across them), so the tier a level is
+Tiers as of 2026-11-09 (Nanamagari go-live): **Easy** Myogi, Momiji, Akagi; **Medium** Tsukuba Fruits Line,
+Sadamine, Akina; **Hard** Hakone Turnpike, Nagao Uphill, Tsuchisaka Inbound; **Extreme** Nanamagari
+Downhill, Tsubaki Line, Irohazaka. Every band is full, so there is no "Coming soon" tile left (`.level-soon`
+takes its tier's colour; copy one back from git history for a new slot). Planned: Happogahara Extreme.
+The bands follow the level order (the level numbers run 01-12 across them), so the tier a level is
 in is where its `.level-slot` sits in `index.html`. Keys (`moveGridCursor`, the user's choice):
 Right / Left go through all levels in order, across bands; Down / Up jump to the band below /
 above, to its card nearest the current one horizontally (the first on a tie, so on a phone the
@@ -340,8 +340,9 @@ band's first card). Both wrap.
   "Eleven kilometres and 900 metres down, flat out through the sweepers." (10.8 km run, 912 m drop, no bend
   under 25 m radius, racing line median 173 km/h), Nagao Uphill (2026-11-08) "The first climb: 300 metres up
   through the switchbacks." (6.7 km, 313 m climb; the first uphill level), Tsuchisaka Inbound (2026-11-08)
-  "Down through the forest: 187 metres of twisting descent." (inbound is the downhill, 187 m drop).
-  Drafts for the user to check.
+  "Down through the forest: 187 metres of twisting descent." (inbound is the downhill, 187 m drop),
+  Nanamagari Downhill (2026-11-09) "Seven hairpins stacked down the mountainside." (the name means "seven
+  bends"; the hairpins themselves were not counted). Drafts for the user to check.
 
 ## Server Status (Level Select)
 Level cards are not hard-coded Online/Offline. While Level Select is open, `script.js` polls
