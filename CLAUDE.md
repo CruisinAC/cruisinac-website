@@ -302,15 +302,18 @@ with a "?", dashed border). They are not `.level-card`s, so they get no status, 
 cursor, and Up / Down skip a band without level cards. Replace a tile with a real `.level-slot` when
 a level for that tier arrives; remove the tiles once the band is full.
 
-Tiers as of 2026-11-09 (Nanamagari go-live): **Easy** Myogi, Momiji, Akagi; **Medium** Tsukuba Fruits Line,
+Tiers as of 2026-11-09 (Happogahara go-live): **Easy** Myogi, Momiji, Akagi; **Medium** Tsukuba Fruits Line,
 Sadamine, Akina; **Hard** Hakone Turnpike, Nagao Uphill, Tsuchisaka Inbound; **Extreme** Nanamagari
-Downhill, Tsubaki Line, Irohazaka. Every band is full, so there is no "Coming soon" tile left (`.level-soon`
-takes its tier's colour; copy one back from git history for a new slot). Planned: Happogahara Extreme.
-The bands follow the level order (the level numbers run 01-12 across them), so the tier a level is
+Downhill, Tsubaki Line, Happogahara Outbound, Irohazaka (four: the band is three across, so Irohazaka wraps
+onto a second row). No "Coming soon" tile is left (`.level-soon` takes its tier's colour; copy one back
+from git history for a new slot).
+The bands follow the level order (the level numbers run 01-13 across them), so the tier a level is
 in is where its `.level-slot` sits in `index.html`. Keys (`moveGridCursor`, the user's choice):
-Right / Left go through all levels in order, across bands; Down / Up jump to the band below /
-above, to its card nearest the current one horizontally (the first on a tie, so on a phone the
-band's first card). Both wrap.
+Right / Left go through all levels in order, across bands; Down / Up go to the row below /
+above, to its card nearest the current one horizontally (the first on a tie). A band that wraps
+(Extreme, four cards) has two rows, stepped through before the next band (2026-11-09). With one
+card across (a phone) every card would be a row, so there Down / Up jump whole bands, to the
+band's first card. Both wrap.
 
 - **Adding a level:** copy a whole `.level-slot` block into its tier's `.level-tier__levels` in
   `index.html` (a new tier: copy a whole `.level-tier` section and change its class and name), change the rank badge

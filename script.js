@@ -112,10 +112,11 @@ const LEVELS = [
   { number: 9, name: 'Tsuchisaka Inbound', short: 'Tsuchisaka', track: 'ek_tsuchisaka-inbound_idas' },
   { number: 10, name: 'Nanamagari Downhill', short: 'Nanamagari', track: 'ek_nanamagari-downhill_idas' },
   { number: 11, name: 'Tsubaki Line Downhill', short: 'Tsubaki', track: 'ek_tsubaki_line-downhill_idas' },
-  { number: 12, name: 'Irohazaka Downhill', short: 'Irohazaka', track: 'ek_irohazaka-downhill_idas' },
+  { number: 12, name: 'Happogahara Outbound', short: 'Happogahara', track: 'ek_happogahara-outbound_idas' },
+  { number: 13, name: 'Irohazaka Downhill', short: 'Irohazaka', track: 'ek_irohazaka-downhill_idas' },
 ];
 // Level shown when the leaderboard opens (Irohazaka, the first level to run the plugin).
-const DEFAULT_LEADERBOARD_LEVEL = 12;
+const DEFAULT_LEADERBOARD_LEVEL = 13;
 
 // The two boards the API offers (`sort=`): score (highest first, a tie goes to the faster
 // time) and time (fastest first, a tie goes to whoever set it first).
@@ -1202,16 +1203,31 @@ window.addEventListener('load', () => {
       select(items[(index + direction + items.length) % items.length], { direction });
       return;
     }
-    const tiers = [...document.querySelectorAll('.level-select .level-tier')]
-      .filter((tier) => tier.querySelector('.level-card'));
-    const here = tiers.indexOf(selected.closest('.level-tier'));
-    const target = tiers[(here + direction + tiers.length) % tiers.length];
+    // Up / Down go row by row: a band's rows, then the next band. A band with more cards than
+    // fit across (Extreme has four) wraps onto a second row. With one card across (a phone),
+    // every card would be a row of its own, so there Up / Down jump whole bands instead.
+    const rowsOf = (tier) => {
+      const cards = [...tier.querySelectorAll('.level-card')];
+      const lefts = new Set(cards.map((card) => Math.round(card.getBoundingClientRect().left)));
+      if (lefts.size < 2) return [cards];
+      const byTop = new Map();
+      cards.forEach((card) => {
+        const top = Math.round(card.getBoundingClientRect().top);
+        byTop.set(top, [...(byTop.get(top) || []), card]);
+      });
+      return [...byTop.keys()].sort((a, b) => a - b).map((top) => byTop.get(top));
+    };
+    const rows = [...document.querySelectorAll('.level-select .level-tier')]
+      .filter((tier) => tier.querySelector('.level-card'))
+      .flatMap(rowsOf);
+    const here = rows.findIndex((row) => row.includes(selected));
+    const target = rows[(here + direction + rows.length) % rows.length];
     const centre = (card) => {
       const box = card.getBoundingClientRect();
       return box.left + box.width / 2;
     };
     const x = centre(selected);
-    const cards = [...target.querySelectorAll('.level-card')];
+    const cards = target;
     const nearest = cards.reduce((best, card) =>
       Math.abs(centre(card) - x) < Math.abs(centre(best) - x) ? card : best);
     select(nearest, { direction });
