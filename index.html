@@ -283,12 +283,25 @@
           <h2 class="level-select__title">Leaderboard</h2>
         </div>
 
-        <div class="leaderboard-tabs" id="leaderboardTabs" role="tablist" aria-label="Choose a level"></div>
+        <div class="leaderboard-switch" id="leaderboardSwitch">
+          <button type="button" class="leaderboard-switch__arrow" id="leaderboardLevelPrev" aria-label="Previous level">&lsaquo;</button>
+          <div class="leaderboard-switch__current" aria-live="polite">
+            <span class="leaderboard-switch__number" id="leaderboardLevelNumber">01</span>
+            <span class="leaderboard-switch__text">
+              <h3 class="leaderboard-switch__name" id="leaderboardLevelName">Level</h3>
+              <span class="leaderboard-switch__tier" id="leaderboardLevelTier"></span>
+            </span>
+          </div>
+          <button type="button" class="leaderboard-switch__arrow" id="leaderboardLevelNext" aria-label="Next level">&rsaquo;</button>
+        </div>
 
         <div class="leaderboard">
           <div class="leaderboard__heading">
-            <h3 id="leaderboardLevelName">Level</h3>
             <div class="leaderboard__controls">
+              <label class="car-filter">
+                <span class="car-filter__label">Level</span>
+                <select class="car-filter__select car-filter__select--level" id="leaderboardLevelSelect"></select>
+              </label>
               <label class="car-filter">
                 <span class="car-filter__label">Car</span>
                 <select class="car-filter__select" id="leaderboardCar">

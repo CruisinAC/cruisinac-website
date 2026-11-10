@@ -215,6 +215,16 @@ its `scripts/watch_jsonl.py`). Settings at the top of `script.js`:
   from the `main` branch at `https://driftrun.cruisin-ac.com`. `_headers` makes Pages serve
   `script.js` and `styles.css` with `max-age=0, must-revalidate`, so a deploy reaches every
   visitor on their next load instead of after Pages' default four-hour asset cache.
+- **Choosing a level (2026-11-09, the user's choice; replaced a wrapping row of tabs):** a header over the
+  board (`.leaderboard-switch`, `renderLeaderboardLevel`) with ‹ › arrows either side of the level's badge,
+  full name and tier (meter and name in the tier's colour); the arrows and Left / Right step through
+  the levels. A **Level** dropdown beside Car (`#leaderboardLevelSelect`) jumps to any level, grouped by
+  tier with `<optgroup>`. The tier is read from Level Select (the band a level's card sits in,
+  `levelTier`), so tiers live only in `index.html`. The header has a fixed width so the arrows never
+  move; on a phone the name wraps onto two lines. Modelled on racing games that show one track's board
+  with a switcher in the header (Gran Turismo, Forza, the Initial D arcade rankings) and Trackmania's
+  colour-tiered campaign. `.pager[hidden]` was added then: `.pager`'s display had beaten the hidden
+  attribute, so Prev / Next showed even with a single page.
 - `LEVELS` - each level's number, name and track key. The key is `TRACK-CONFIG_TRACK` from that
   level server's `server_cfg.ini`, the same `Track` the plugin records.
 - `LEADERBOARD_SORTS` - the two boards behind the Score / Time toggle. Score: highest score,

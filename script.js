@@ -142,7 +142,12 @@ window.addEventListener('load', () => {
   const startGate = document.getElementById('startGate');
   const levelCards = document.querySelectorAll('.level-card');
   const levelSelectNote = document.getElementById('levelSelectNote');
-  const leaderboardTabs = document.getElementById('leaderboardTabs');
+  const leaderboardSwitch = document.getElementById('leaderboardSwitch');
+  const leaderboardLevelPrev = document.getElementById('leaderboardLevelPrev');
+  const leaderboardLevelNext = document.getElementById('leaderboardLevelNext');
+  const leaderboardLevelNumber = document.getElementById('leaderboardLevelNumber');
+  const leaderboardLevelTier = document.getElementById('leaderboardLevelTier');
+  const leaderboardLevelSelect = document.getElementById('leaderboardLevelSelect');
   const leaderboardLevelName = document.getElementById('leaderboardLevelName');
   const leaderboardSort = document.getElementById('leaderboardSort');
   const leaderboardCar = document.getElementById('leaderboardCar');
@@ -467,26 +472,63 @@ window.addEventListener('load', () => {
     }
   };
 
-  const renderLeaderboardTabs = () => {
-    leaderboardTabs.replaceChildren(...LEVELS.map((level) => {
-      const tab = document.createElement('button');
-      tab.type = 'button';
-      tab.className = 'leaderboard-tab';
-      tab.setAttribute('role', 'tab');
-      tab.setAttribute('aria-selected', level === leaderboardLevel ? 'true' : 'false');
-      tab.setAttribute('aria-label', `Level ${level.number} ${level.name}`);
+  // A level's difficulty tier is the Level Select band its card sits in (index.html), so the
+  // tiers are defined in one place: { name, rank (1 Easy .. 4 Extreme), color }.
+  const levelTier = (level) => {
+    const card = [...document.querySelectorAll('.level-select .level-card')]
+      .find((item) => cardLevel(item) === level.number);
+    const tier = card ? card.closest('.level-tier') : null;
+    if (!tier) return null;
+    const tiers = [...document.querySelectorAll('.level-select .level-tier')];
+    return {
+      name: tier.querySelector('.level-tier__name').textContent.trim(),
+      rank: tiers.indexOf(tier) + 1,
+      color: getComputedStyle(tier).getPropertyValue('--tier-color').trim(),
+    };
+  };
 
-      const number = document.createElement('span');
-      number.className = 'leaderboard-tab__number';
-      number.textContent = twoDigits(level.number);
-      const label = document.createElement('span');
-      label.textContent = level.short;
-      tab.append(number, label);
+  // The Level dropdown: one group per tier, in level order (built once).
+  const renderLeaderboardLevelOptions = () => {
+    const groups = [];
+    LEVELS.forEach((level) => {
+      const tier = levelTier(level);
+      const label = tier ? tier.name : 'Other';
+      let group = groups.find((item) => item.label === label);
+      if (!group) {
+        group = document.createElement('optgroup');
+        group.label = label;
+        groups.push(group);
+      }
+      const option = document.createElement('option');
+      option.value = String(level.number);
+      option.textContent = `${twoDigits(level.number)} ${level.name}`;
+      group.append(option);
+    });
+    leaderboardLevelSelect.replaceChildren(...groups);
+  };
 
-      tab.addEventListener('click', () => selectLeaderboardLevel(level));
-      return tab;
-    }));
-    leaderboardLevelName.textContent = `Level ${twoDigits(leaderboardLevel.number)} - ${leaderboardLevel.name}`;
+  // The header over the board: the level's number badge, full name, and its tier (meter and
+  // name in the tier's colour). One line however many levels there are; the arrows and the
+  // Left / Right keys step through them, the Level dropdown jumps.
+  const renderLeaderboardLevel = () => {
+    const tier = levelTier(leaderboardLevel);
+    leaderboardLevelNumber.textContent = twoDigits(leaderboardLevel.number);
+    leaderboardLevelName.textContent = leaderboardLevel.name;
+    leaderboardLevelTier.replaceChildren();
+    if (tier) {
+      const meter = document.createElement('span');
+      meter.className = 'level-tier__meter';
+      meter.setAttribute('aria-hidden', 'true');
+      for (let i = 1; i <= 4; i += 1) {
+        const bar = document.createElement('i');
+        if (i <= tier.rank) bar.className = 'is-lit';
+        meter.append(bar);
+      }
+      leaderboardLevelTier.append(meter, tier.name);
+      leaderboardSwitch.style.setProperty('--tier-color', tier.color);
+    }
+    if (leaderboardLevelSelect.options.length === 0) renderLeaderboardLevelOptions();
+    leaderboardLevelSelect.value = String(leaderboardLevel.number);
   };
 
   // Clear the table before a different level or board loads, so stale rows
@@ -514,7 +556,7 @@ window.addEventListener('load', () => {
     if (level === leaderboardLevel) return;
     leaderboardLevel = level;
     clearLeaderboard();
-    renderLeaderboardTabs();
+    renderLeaderboardLevel();
     loadLeaderboard();
   };
 
@@ -574,7 +616,7 @@ window.addEventListener('load', () => {
   });
 
   const startLeaderboard = async () => {
-    renderLeaderboardTabs();
+    renderLeaderboardLevel();
     // Start the refresh timer before any awaiting, so stopLeaderboard can always
     // find it if the player leaves the view while the car list is still loading.
     if (leaderboardTimer === null) {
@@ -1274,8 +1316,7 @@ window.addEventListener('load', () => {
     expectFullscreenDrop();
   }));
 
-  // Leaderboard controls (the tabs are rebuilt on every render, so listen on their container).
-  leaderboardTabs.addEventListener('click', (event) => { if (event.target.closest('.leaderboard-tab')) Sfx.tick(); });
+  // Leaderboard controls
   leaderboardSort.addEventListener('click', (event) => { if (event.target.closest('.sort-toggle__option')) Sfx.tick(); });
   leaderboardCar.addEventListener('change', () => Sfx.tick());
   [leaderboardPrev, leaderboardNext].forEach((button) => button.addEventListener('click', () => Sfx.tick()));
@@ -1286,6 +1327,15 @@ window.addEventListener('load', () => {
     Sfx.move(direction);
     selectLeaderboardLevel(next);
   };
+
+  leaderboardLevelPrev.addEventListener('click', () => stepLeaderboardLevel(-1));
+  leaderboardLevelNext.addEventListener('click', () => stepLeaderboardLevel(1));
+  leaderboardLevelSelect.addEventListener('change', () => {
+    const level = LEVELS.find((item) => String(item.number) === leaderboardLevelSelect.value);
+    if (!level) return;
+    Sfx.tick();
+    selectLeaderboardLevel(level);
+  });
 
   // The key hints along the bottom of the screen, per view (hidden on touch screens).
   const KEY_LEGENDS = {
