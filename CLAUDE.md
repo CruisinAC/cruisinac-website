@@ -130,8 +130,8 @@ landing screen that waits for one:
   car select appears, so it gets no hint (`IS_FIREFOX`, user agent check); the next press still
   goes back.
 - **Sound panel** (the speaker button, top right): Music and Effects sliders (0-100) and Mute
-  All. Loudness = (slider / 100)^2, so the defaults `DEFAULT_MUSIC_LEVEL` 25 and
-  `DEFAULT_SFX_LEVEL` 60 (top of `script.js`) are 0.06 and 0.36. Slider positions are saved in
+  All. Loudness = (slider / 100)^2, so the defaults `DEFAULT_MUSIC_LEVEL` 40 and
+  `DEFAULT_SFX_LEVEL` 65 (top of `script.js`; the user's choice 2026-11-09, were 25 / 60) are 0.16 and 0.42. Slider positions are saved in
   `localStorage` (`cruisinAcVolume`); Mute All is per browser tab (`sessionStorage`). The
   Effects slider blips as it moves so the level can be heard. Esc or a click elsewhere closes it.
 - **Cruisin AC intro sounds** (2026-10-11): recorded files in `assets/audio/`, played through
@@ -305,7 +305,8 @@ a level for that tier arrives; remove the tiles once the band is full.
 Tiers as of 2026-11-09 (Happogahara go-live): **Easy** Myogi, Momiji, Akagi; **Medium** Tsukuba Fruits Line,
 Sadamine, Akina; **Hard** Hakone Turnpike, Nagao Uphill, Tsuchisaka Inbound; **Extreme** Nanamagari
 Downhill, Tsubaki Line, Happogahara Outbound, Irohazaka (four: the band is three across, so Irohazaka wraps
-onto a second row). No "Coming soon" tile is left (`.level-soon` takes its tier's colour; copy one back
+onto a second row, centred: a container query on `.level-tier__levels` puts a lone last card in the middle
+column when the band is exactly three across). No "Coming soon" tile is left (`.level-soon` takes its tier's colour; copy one back
 from git history for a new slot).
 The bands follow the level order (the level numbers run 01-13 across them), so the tier a level is
 in is where its `.level-slot` sits in `index.html`. Keys (`moveGridCursor`, the user's choice):

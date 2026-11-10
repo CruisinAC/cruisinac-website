@@ -44,8 +44,8 @@ const MUTE_KEY = 'cruisinAcMuted';
 // position (25 -> 0.06), which feels even across the range, unlike a straight line.
 // The player's choice is remembered in this browser (VOLUME_KEY).
 const VOLUME_KEY = 'cruisinAcVolume';
-const DEFAULT_MUSIC_LEVEL = 25;
-const DEFAULT_SFX_LEVEL = 60;
+const DEFAULT_MUSIC_LEVEL = 40; // the user's choice, 2026-11-09 (was 25 / 60)
+const DEFAULT_SFX_LEVEL = 65;
 const MUSIC_FADE_MS = 1000; // the music fades in from silence over this long
 
 // Cruisin AC intro timing (ms after the intro starts) and the sounds tied to it.

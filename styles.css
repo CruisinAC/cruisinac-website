@@ -407,6 +407,14 @@ h3 {
   display: grid;
   grid-template-columns: repeat(auto-fill, minmax(min(290px, 100%), 1fr));
   column-gap: 20px;
+  container-type: inline-size;
+}
+/* A lone card on a band's last row (Extreme's fourth, Irohazaka) sits in the middle column. Only when
+   the band is exactly three across: 3 x 290 + 2 x 20 = 910 px fits three, 1220 px would fit four. */
+@container (min-width: 910px) and (max-width: 1219.98px) {
+  .level-slot:last-child:nth-child(3n + 1) {
+    grid-column: 2;
+  }
 }
 /* A tile and its password tray (script.js adds the tray right after the card). Two rows
    shared across the tier's row, so tiles line up whether or not their neighbours have a tray. */
