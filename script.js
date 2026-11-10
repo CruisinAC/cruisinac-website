@@ -787,7 +787,11 @@ window.addEventListener('load', () => {
     copy.dataset.action = 'copy';
     copy.textContent = 'Copy';
     copy.addEventListener('click', () => copyPassword(row, copy));
-    row.append(label, value, show, copy);
+    // Show and Copy stay together on one line (a narrow tile wrapped Copy below Show)
+    const actions = document.createElement('span');
+    actions.className = 'level-password__actions';
+    actions.append(show, copy);
+    row.append(label, value, actions);
     setPasswordShown(row, false);
     return row;
   };
@@ -857,12 +861,19 @@ window.addEventListener('load', () => {
     card.classList.toggle('level-card--locked', locked);
     card.classList.toggle('level-card--finished', finished);
 
-    const description = card.querySelector('.level-card__body p');
-    if (description) {
-      if (description.dataset.original === undefined) description.dataset.original = description.textContent;
-      description.textContent = !locked ? description.dataset.original
-        : signedOutLock ? 'Sign in with Steam to unlock.'
-          : `Finish Level ${level - 1} to unlock.`;
+    // The cards carry no description line (the user's choice, 2026-11-09): only a locked one
+    // gets a line under its name, saying how to unlock it.
+    const reason = !locked ? ''
+      : signedOutLock ? 'Sign in with Steam to unlock.'
+        : `Finish Level ${level - 1} to unlock.`;
+    let note = card.querySelector('.level-card__body p');
+    if (reason && !note) {
+      note = document.createElement('p');
+      card.querySelector('.level-card__body h3').after(note);
+    }
+    if (note) {
+      note.hidden = !reason;
+      note.textContent = reason;
     }
 
     let mark = card.querySelector('.level-card__finished');

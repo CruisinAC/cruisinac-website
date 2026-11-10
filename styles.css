@@ -266,7 +266,8 @@ h3 {
 }
 
 .level-password__label {
-  flex: 1 1 auto;
+  flex: 1 1 0;
+  min-width: min-content;
   color: var(--sunset);
   font: italic 600 0.82rem/1 var(--font-numbers);
   letter-spacing: 0.1em;
@@ -285,6 +286,13 @@ h3 {
   user-select: all;
 }
 
+/* Show and Copy: never split across two lines. The label wraps first, then the pair moves below it */
+.level-password__actions {
+  display: flex;
+  flex: none;
+  gap: 8px;
+}
+
 /* Level 1's tray: nothing to show or copy */
 .level-password--open .level-password__value {
   color: var(--muted);
@@ -294,6 +302,7 @@ h3 {
 
 .level-password__button {
   padding: 6px 10px;
+  white-space: nowrap;
   border-radius: 999px;
   border: 1px solid rgba(255, 255, 255, 0.16);
   background: rgba(255, 255, 255, 0.05);

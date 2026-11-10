@@ -268,7 +268,9 @@ and Sign out. The site reads `GET /me` and `GET /me/progress` with `credentials:
   Locked cards keep the cursor, get a padlock on the badge and over a greyed thumbnail.
 - **Passwords** (`GET /me/passwords`, only for the signed-in player, only those earned:
   finishing Level N earns Level N+1's): a tray under each unlocked card whose password was
-  earned (`.level-password`, `applyPasswordToCard`), dots until **Show**, plus **Copy**. It
+  earned (`.level-password`, `applyPasswordToCard`), dots until **Show**, plus **Copy**. Show and
+  Copy sit together in `.level-password__actions` and never split across two lines (2026-11-09): the label
+  wraps first (down to its longest word), then the pair moves below it as one. It
   is a sibling of the card, not inside it, because the card is the Join link. Rows hide again
   each time Level Select opens. Signed in, Level 1's card has a tray too, "Not needed · open to
   every driver" (`.level-password--open`). Signed out it has none (a tray under one tile leaves
@@ -312,7 +314,7 @@ band's first card). Both wrap.
 
 - **Adding a level:** copy a whole `.level-slot` block into its tier's `.level-tier__levels` in
   `index.html` (a new tier: copy a whole `.level-tier` section and change its class and name), change the rank badge
-  (its number is how `cardLevel` finds the level), pictures, name and text, renumber the badges
+  (its number is how `cardLevel` finds the level), pictures and name (no description line), renumber the badges
   after it, and add it to `LEVELS` in `script.js`. Pictures are the game's own
   `content/tracks/<track>/ui/<layout>/preview.png` and `outline.png`, named after the track
   without a level number (`assets/images/tracks/akagi-downhill.png`, `...-outline.png`), so
@@ -332,17 +334,10 @@ band's first card). Both wrap.
   Level 1 or the last level chosen, except on touch screens. `moveGridCursor`: Right / Left =
   next / previous level in order, Down / Up = the next / previous tier (see above); the key hint
   shows all four arrows.
-- **Card lines (2026-11-07):** Akagi "The steepest drop yet, hairpin after hairpin." (7.3%
-  average grade, 413 m drop, 16 hairpins), Tsubaki "Bend after tight bend, barely a straight to
-  breathe." (34 bends under 40 m radius, longest straight 105 m), Irohazaka "Nineteen stacked
-  hairpins. The final test." (19 hairpins in 4.9 km), Sadamine (2026-11-08) "A narrow ribbon of road through twenty-nine tight
-  bends." (6.6 km, 29 bends under 40 m radius, a 3 m road by its `ui_track.json`), Hakone Turnpike (2026-11-08)
-  "Eleven kilometres and 900 metres down, flat out through the sweepers." (10.8 km run, 912 m drop, no bend
-  under 25 m radius, racing line median 173 km/h), Nagao Uphill (2026-11-08) "The first climb: 300 metres up
-  through the switchbacks." (6.7 km, 313 m climb; the first uphill level), Tsuchisaka Inbound (2026-11-08)
-  "Down through the forest: 187 metres of twisting descent." (inbound is the downhill, 187 m drop),
-  Nanamagari Downhill (2026-11-09) "Seven hairpins stacked down the mountainside." (the name means "seven
-  bends"; the hairpins themselves were not counted). Drafts for the user to check.
+- **No card lines (2026-11-09, the user's choice):** a tile shows only the track picture, number,
+  status and name; the one-line descriptions under the names were removed (they took up too much
+  space). A locked tile still gets one line under its name, made by `applyProgressToCard`: "Sign in
+  with Steam to unlock." or "Finish Level N to unlock." (hidden again once it unlocks).
 
 ## Server Status (Level Select)
 Level cards are not hard-coded Online/Offline. While Level Select is open, `script.js` polls
