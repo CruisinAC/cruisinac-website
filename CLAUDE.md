@@ -219,7 +219,8 @@ its `scripts/watch_jsonl.py`). Settings at the top of `script.js`:
   board (`.leaderboard-switch`, `renderLeaderboardLevel`) with ‹ › arrows either side of the level's badge,
   full name and tier (meter and name in the tier's colour); the arrows and Left / Right step through
   the levels. A **Level** dropdown beside Car (`#leaderboardLevelSelect`) jumps to any level, grouped by
-  tier with `<optgroup>`. The tier is read from Level Select (the band a level's card sits in,
+  tier with `<optgroup>`, each heading in its tier's colour on the list's dark background (without a
+  background of their own the headings were white on white). The tier is read from Level Select (the band a level's card sits in,
   `levelTier`), so tiers live only in `index.html`. The header has a fixed width so the arrows never
   move; on a phone the name wraps onto two lines. Modelled on racing games that show one track's board
   with a switcher in the header (Gran Turismo, Forza, the Initial D arcade rankings) and Trackmania's
@@ -282,9 +283,11 @@ and Sign out. The site reads `GET /me` and `GET /me/progress` with `credentials:
   Copy sit together in `.level-password__actions` and never split across two lines (2026-11-09): the label
   wraps first (down to its longest word), then the pair moves below it as one. It
   is a sibling of the card, not inside it, because the card is the Join link. Rows hide again
-  each time Level Select opens. Signed in, Level 1's card has a tray too, "Not needed · open to
-  every driver" (`.level-password--open`). Signed out it has none (a tray under one tile leaves
-  a hole under its neighbours): `#levelSelectNote` under the title says the same. Finishes
+  each time Level Select opens. **Every card has a tray (2026-11-09, the user's choice)**, so a mix of
+  locked and unlocked tiles looks the same: where there is no password to show, a
+  `.level-password--open` tray says why: Level 1 "Not needed · open to every driver"; a locked level
+  "Finish Level NN to unlock" (signed in) or "Sign in with Steam to unlock" (signed out); "Unlocked"
+  if the password has not loaded. Signed out, `#levelSelectNote` under the title also says it. Finishes
   count whether or not the player was signed in on the site: the game server records them by
   Steam ID, so signing in later shows every password already earned (no need to redo a level).
   Tray text and the status badges (ONLINE / LOCKED / ...) use Exo 2 SemiBold Italic like the numbers. Passwords are never in the site's code or files; the game
@@ -350,8 +353,7 @@ band's first card. Both wrap.
   shows all four arrows.
 - **No card lines (2026-11-09, the user's choice):** a tile shows only the track picture, number,
   status and name; the one-line descriptions under the names were removed (they took up too much
-  space). A locked tile still gets one line under its name, made by `applyProgressToCard`: "Sign in
-  with Steam to unlock." or "Finish Level N to unlock." (hidden again once it unlocks).
+  space). How to unlock a locked level is in its password tray (see Passwords), not on the tile.
 
 ## Server Status (Level Select)
 Level cards are not hard-coded Online/Offline. While Level Select is open, `script.js` polls

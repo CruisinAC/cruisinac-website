@@ -497,6 +497,7 @@ window.addEventListener('load', () => {
       if (!group) {
         group = document.createElement('optgroup');
         group.label = label;
+        if (tier) group.style.color = tier.color;
         groups.push(group);
       }
       const option = document.createElement('option');
@@ -839,12 +840,12 @@ window.addEventListener('load', () => {
     return row;
   };
 
-  // Called with the card's progress: a row for an unlocked level whose password was earned.
-  // Level 1 is open to everyone, so signed in its tray says no password is needed. Signed
-  // out, the note under the title says so instead (a tray under one tile would leave a gap
-  // under its neighbours) and that passwords are on the website: finishes count whether or
-  // not the player is signed in here (the game server records them by Steam ID), so
-  // signing in later shows them all.
+  // Every card has a tray under it, so tiles look the same whatever mix of locked and unlocked
+  // levels a player has (the user's choice, 2026-11-09). An earned password gets Show / Copy;
+  // otherwise the tray says why there is none: Level 1 is open to every driver, a locked level
+  // says how to unlock it (finish the level before it; signed out, sign in with Steam:
+  // finishes count whether or not the player was signed in here, the game server records
+  // them by Steam ID).
   const makeOpenLevelRow = (level) => {
     const row = document.createElement('div');
     row.className = 'level-password level-password--open';
@@ -860,32 +861,31 @@ window.addEventListener('load', () => {
 
   const applyPasswordToCard = (card, locked) => {
     const level = cardLevel(card);
-    if (level === 1) {
-      levelSelectNote.hidden = Boolean(account);
-      let row = passwordRow(card);
-      if (!account) {
-        if (row) row.remove();
-        return;
-      }
-      if (!row) {
-        row = makeOpenLevelRow(level);
-        card.after(row);
-      }
-      row.querySelector('.level-password__value').textContent = 'Not needed \u00b7 open to every driver';
-      return;
-    }
-    const earned = Boolean(account && !locked && passwords && passwords.get(level));
+    if (level === 1) levelSelectNote.hidden = Boolean(account);
+    const earned = level > 1 && Boolean(account && !locked && passwords && passwords.get(level));
     let row = passwordRow(card);
-    if (!earned) {
-      if (row) row.remove();
+    // A tray of the other kind is swapped out (a level can unlock while the page is open)
+    if (row && row.classList.contains('level-password--open') === earned) {
+      row.remove();
+      row = null;
+    }
+    if (earned) {
+      if (!row) {
+        row = makePasswordRow(level);
+        card.after(row);
+      } else {
+        setPasswordShown(row, Boolean(row.dataset.shown)); // the password may have changed
+      }
       return;
     }
     if (!row) {
-      row = makePasswordRow(level);
+      row = makeOpenLevelRow(level);
       card.after(row);
-    } else {
-      setPasswordShown(row, Boolean(row.dataset.shown)); // the password may have changed
     }
+    row.querySelector('.level-password__value').textContent = level === 1 ? 'Not needed \u00b7 open to every driver'
+      : !locked ? 'Unlocked'
+        : account ? `Finish Level ${twoDigits(level - 1)} to unlock`
+          : 'Sign in with Steam to unlock';
   };
 
   const hideAllPasswords = () => {
@@ -904,20 +904,6 @@ window.addEventListener('load', () => {
     card.classList.toggle('level-card--locked', locked);
     card.classList.toggle('level-card--finished', finished);
 
-    // The cards carry no description line (the user's choice, 2026-11-09): only a locked one
-    // gets a line under its name, saying how to unlock it.
-    const reason = !locked ? ''
-      : signedOutLock ? 'Sign in with Steam to unlock.'
-        : `Finish Level ${level - 1} to unlock.`;
-    let note = card.querySelector('.level-card__body p');
-    if (reason && !note) {
-      note = document.createElement('p');
-      card.querySelector('.level-card__body h3').after(note);
-    }
-    if (note) {
-      note.hidden = !reason;
-      note.textContent = reason;
-    }
 
     let mark = card.querySelector('.level-card__finished');
     if (finished && !mark) {
