@@ -206,7 +206,7 @@ HTTP port. Existing level configs live in
 `momiji_line_outrun`, `batang_kali_outrun`, `pch_outrun`).
 
 ## Leaderboard
-The Leaderboard view (`#leaderboard`) reads `GET /leaderboard?track=<key>&sort=score|time&page=<n>&page_size=25[&car=<model>]` from the results API,
+The Leaderboard view (`#leaderboard`) reads `GET /leaderboard?track=<key>&sort=score|time|overall&page=<n>&page_size=25[&car=<model>]` from the results API,
 `C:\Users\mannr\Documents\GitHub\cruisinac-api\` (FastAPI + Postgres; game servers feed it via
 its `scripts/watch_jsonl.py`). Settings at the top of `script.js`:
 - `API_BASE_URL` - `https://api.cruisin-ac.com`, the API on the home PC through a Cloudflare
@@ -228,8 +228,11 @@ its `scripts/watch_jsonl.py`). Settings at the top of `script.js`:
   attribute, so Prev / Next showed even with a single page.
 - `LEVELS` - each level's number, name and track key. The key is `TRACK-CONFIG_TRACK` from that
   level server's `server_cfg.ini`, the same `Track` the plugin records.
-- `LEADERBOARD_SORTS` - the two boards behind the Score / Time toggle. Score: highest score,
-  ties to the faster time. Time: fastest run, ties to whoever set it first. (A one-line rule
+- `LEADERBOARD_SORTS` - the three boards behind the Score / Time / Overall toggle. Score: highest
+  score, ties to the faster time. Time: fastest run, ties to whoever set it first. Overall
+  (2026-11-14, the user's request): most points per millisecond (score / time, the API's
+  `points_per_ms`, shown to two decimals in the Pts/ms column), ties to the higher score. On a
+  phone the Pts/ms column only shows on the Overall board, in Time's place. (A one-line rule
   under the level name used to spell this out; removed at the user's request on 2026-10-11.) A player's row can be a different run on each board. The ranked
   column is highlighted via the table's `data-sort` attribute.
 - The car dropdown and the car names in the table come from the API's `GET /cars`

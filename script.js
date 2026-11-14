@@ -118,9 +118,10 @@ const LEVELS = [
 // Level shown when the leaderboard opens (Irohazaka, the first level to run the plugin).
 const DEFAULT_LEADERBOARD_LEVEL = 13;
 
-// The two boards the API offers (`sort=`): score (highest first, a tie goes to the faster
-// time) and time (fastest first, a tie goes to whoever set it first).
-const LEADERBOARD_SORTS = ['score', 'time'];
+// The three boards the API offers (`sort=`): score (highest first, a tie goes to the faster
+// time), time (fastest first, a tie goes to whoever set it first) and overall (most points
+// per millisecond first, a tie goes to the higher score).
+const LEADERBOARD_SORTS = ['score', 'time', 'overall'];
 const DEFAULT_LEADERBOARD_SORT = 'score';
 
 window.addEventListener('load', () => {
@@ -383,6 +384,10 @@ window.addEventListener('load', () => {
     return `${minutes}:${rest.toFixed(3).padStart(6, '0')}`;
   };
 
+  // 402.6491 -> "402.65"
+  const formatPointsPerMs = (value) =>
+    Number(value).toLocaleString('en-US', { minimumFractionDigits: 2, maximumFractionDigits: 2 });
+
   // "ks_toyota_ae86_tuned" -> "toyota ae86 tuned" (shown uppercase by CSS)
   const formatCar = (car) => car.replace(/^ks_/, '').replace(/_/g, ' ');
 
@@ -414,6 +419,7 @@ window.addEventListener('load', () => {
       { className: 'leaderboard__car', value: (e) => carName(e.car) },
       { className: 'num leaderboard__col-score', value: (e) => formatScore(e.score) },
       { className: 'num leaderboard__col-time', value: (e) => formatTime(e.total_time_seconds) },
+      { className: 'num leaderboard__col-overall', value: (e) => formatPointsPerMs(e.points_per_ms) },
       { className: 'leaderboard__date', value: (e) => formatDate(e.timestamp_utc) },
     ];
 
