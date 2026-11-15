@@ -167,7 +167,7 @@ landing screen that waits for one:
   per view, hidden on touch screens.
 
 ## Options Menu (2026-10-10)
-Title menu > **Options** (`#options`) is a second menu in the same arcade style, with five
+Title menu (Level Select, Leaderboard, Options, Credits; Leaderboard above Options since 2026-11-14) > **Options** (`#options`) is a second menu in the same arcade style, with five
 pages: **About** (`#about`), **How to Play** (`#how-to-play`), **Controls** (`#controls`),
 **Rules** (`#rules`) and **Downloads / Installation** (`#downloads`). Each page is its own
 `<section class="view">` in `index.html` and currently shows an UNDER CONSTRUCTION placeholder
@@ -322,7 +322,7 @@ Tiers as of 2026-11-09 (Happogahara go-live): **Easy** Myogi, Momiji, Akagi; **M
 Sadamine, Akina; **Hard** Hakone Turnpike, Nagao Uphill, Tsuchisaka Inbound; **Extreme** Nanamagari
 Downhill, Tsubaki Line, Happogahara Outbound, Irohazaka (four: the band is three across, so Irohazaka wraps
 onto a second row, centred: a container query on `.level-tier__levels` puts a lone last card in the middle
-column when the band is exactly three across). No "Coming soon" tile is left (`.level-soon` takes its tier's colour; copy one back
+column when the band is exactly three across). (Tried 2026-11-14 and turned down by the user: four in Easy with Level 1 alone and centred on the top row, Tsukuba, Hakone and Nanamagari each one tier lower; the layout above stays.) No "Coming soon" tile is left (`.level-soon` takes its tier's colour; copy one back
 from git history for a new slot).
 The bands follow the level order (the level numbers run 01-13 across them), so the tier a level is
 in is where its `.level-slot` sits in `index.html`. Keys (`moveGridCursor`, the user's choice):
