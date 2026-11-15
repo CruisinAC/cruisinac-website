@@ -479,7 +479,7 @@ window.addEventListener('load', () => {
   };
 
   // A level's difficulty tier is the Level Select band its card sits in (index.html), so the
-  // tiers are defined in one place: { name, rank (1 Easy .. 4 Extreme), color }.
+  // tiers are defined in one place: { name, rank (1 Easy .. 4 Expert), color }.
   const levelTier = (level) => {
     const card = [...document.querySelectorAll('.level-select .level-card')]
       .find((item) => cardLevel(item) === level.number);
@@ -1238,7 +1238,7 @@ window.addEventListener('load', () => {
       return;
     }
     // Up / Down go row by row: a band's rows, then the next band. A band with more cards than
-    // fit across (Extreme has four) wraps onto a second row. With one card across (a phone),
+    // fit across (Expert has four) wraps onto a second row. With one card across (a phone),
     // every card would be a row of its own, so there Up / Down jump whole bands instead.
     const rowsOf = (tier) => {
       const cards = [...tier.querySelectorAll('.level-card')];

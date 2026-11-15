@@ -352,8 +352,8 @@ h3 {
   border: 1px dashed rgba(255, 255, 255, 0.18);
 }
 
-/* Difficulty tiers (2026-11-07): one band per tier, Easy / Medium / Hard (Extreme later), each a
-   coloured heading with a four-bar meter (1 lit for Easy .. 4 for Extreme) over its levels, up to three across. */
+/* Difficulty tiers (2026-11-07): one band per tier, Easy / Medium / Hard (Expert later), each a
+   coloured heading with a four-bar meter (1 lit for Easy .. 4 for Expert) over its levels, up to three across. */
 .level-select {
   display: grid;
   gap: 26px;
@@ -365,7 +365,7 @@ h3 {
 }
 .level-tier--medium { --tier-color: var(--sunset); }
 .level-tier--hard { --tier-color: var(--hot); }
-.level-tier--extreme { --tier-color: #c46bff; }
+.level-tier--expert { --tier-color: #c46bff; }
 .level-tier__header {
   display: flex;
   align-items: center;
@@ -399,7 +399,7 @@ h3 {
 .level-tier--easy .level-tier__meter i:nth-child(-n + 1),
 .level-tier--medium .level-tier__meter i:nth-child(-n + 2),
 .level-tier--hard .level-tier__meter i:nth-child(-n + 3),
-.level-tier--extreme .level-tier__meter i:nth-child(-n + 4) {
+.level-tier--expert .level-tier__meter i:nth-child(-n + 4) {
   background: var(--tier-color);
   box-shadow: 0 0 8px color-mix(in srgb, var(--tier-color) 60%, transparent);
 }
@@ -409,7 +409,7 @@ h3 {
   column-gap: 20px;
   container-type: inline-size;
 }
-/* A lone card on a band's last row (Extreme's fourth, Irohazaka) sits in the middle column. Only when
+/* A lone card on a band's last row (Expert's fourth, Irohazaka) sits in the middle column. Only when
    the band is exactly three across: 3 x 290 + 2 x 20 = 910 px fits three, 1220 px would fit four. */
 @container (min-width: 910px) and (max-width: 1219.98px) {
   .level-slot:last-child:nth-child(3n + 1) {
@@ -429,7 +429,7 @@ h3 {
 .level-tier .level-card {
   border-top: 3px solid var(--tier-color);
 }
-/* "Coming soon" tiles for a tier with no levels yet (Extreme): the size of a level tile, but
+/* "Coming soon" tiles for a tier with no levels yet (Expert): the size of a level tile, but
    not a .level-card, so no status, no join link and no cursor (Up / Down skip the band). */
 .level-soon {
   display: flex;

@@ -309,17 +309,17 @@ starting grid (2026-11-07, rejected: tiles packed too tight, and a starting grid
 checkpoint drifting game). Now the levels are grouped into difficulty tiers (the user's design):
 one `<section class="level-tier level-tier--<tier>">` band per tier inside `.level-select`, each
 with a heading (`.level-tier__name`, the tier's colour, and `.level-tier__meter`: four slanted
-bars, 1 lit for Easy, 2 Medium, 3 Hard, 4 Extreme) over `.level-tier__levels`, an `auto-fill`
+bars, 1 lit for Easy, 2 Medium, 3 Hard, 4 Expert) over `.level-tier__levels`, an `auto-fill`
 grid of its tiles (up to three across on a desktop, one on a phone). Each tile gets a 3px top
 stripe in its tier's colour. Colours: Easy green `#4fe08a`, Medium `--sunset`, Hard `--hot`,
-**Extreme purple `#c46bff`** (the user wants the tier after Hard purple). A band's free places are
+**Expert purple `#c46bff`** (the user wants the tier after Hard purple; named Extreme until 2026-11-14, class `level-tier--expert`). A band's free places are
 "Coming soon" tiles (`.level-soon`: the size of a level tile, striped picture area in the tier's colour
 with a "?", dashed border). They are not `.level-card`s, so they get no status, no join link and no
 cursor, and Up / Down skip a band without level cards. Replace a tile with a real `.level-slot` when
 a level for that tier arrives; remove the tiles once the band is full.
 
 Tiers as of 2026-11-09 (Happogahara go-live): **Easy** Myogi, Momiji, Akagi; **Medium** Tsukuba Fruits Line,
-Sadamine, Akina; **Hard** Hakone Turnpike, Nagao Uphill, Tsuchisaka Inbound; **Extreme** Nanamagari
+Sadamine, Akina; **Hard** Hakone Turnpike, Nagao Uphill, Tsuchisaka Inbound; **Expert** Nanamagari
 Downhill, Tsubaki Line, Happogahara Outbound, Irohazaka (four: the band is three across, so Irohazaka wraps
 onto a second row, centred: a container query on `.level-tier__levels` puts a lone last card in the middle
 column when the band is exactly three across). (Tried 2026-11-14 and turned down by the user: four in Easy with Level 1 alone and centred on the top row, Tsukuba, Hakone and Nanamagari each one tier lower; the layout above stays.) No "Coming soon" tile is left (`.level-soon` takes its tier's colour; copy one back
@@ -328,7 +328,7 @@ The bands follow the level order (the level numbers run 01-13 across them), so t
 in is where its `.level-slot` sits in `index.html`. Keys (`moveGridCursor`, the user's choice):
 Right / Left go through all levels in order, across bands; Down / Up go to the row below /
 above, to its card nearest the current one horizontally (the first on a tie). A band that wraps
-(Extreme, four cards) has two rows, stepped through before the next band (2026-11-09). With one
+(Expert, four cards) has two rows, stepped through before the next band (2026-11-09). With one
 card across (a phone) every card would be a row, so there Down / Up jump whole bands, to the
 band's first card. Both wrap.
 
