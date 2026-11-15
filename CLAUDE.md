@@ -64,7 +64,8 @@ The third Credits section points players to the **Car Pack** at
 link, which would go stale). Keep the wording to "modded cars and traffic":
 
 - SRP distributes the pack but did not build these cars (the `ddm_` cars' author is ДЯДЯ ДИМА, the
-  traffic cars' Opperslang + Just Kauser, the two Hondas' RaptorJeezus and Seb/Amy), so the page must not say SRP made them.
+  traffic cars' Opperslang + Just Kauser, the 180SX's Lenny; until 2026-11-15 the two Hondas' RaptorJeezus and Seb/Amy), so the page must not say SRP made them.
+  `lk_nissan_180sx_96` and `ddm_toyota_supra_ma70` are in pack 3.6 with a `data.acd` identical to the game's (checked 2026-11-15).
 - Checked against the pack 3.6 file list on 2026-10-30: all six `traffic_*` cars and the
   `ddm_*` / `p3_*` cars on the level servers are in it. `ks_toyota_ae86_tuned` and
   `ks_toyota_supra_mkiv` are NOT: they are official AC cars.
