@@ -327,11 +327,14 @@ column when the band is exactly three across). (Tried 2026-11-14 and turned down
 from git history for a new slot).
 The bands follow the level order (the level numbers run 01-13 across them), so the tier a level is
 in is where its `.level-slot` sits in `index.html`. Keys (`moveGridCursor`, the user's choice):
-Right / Left go through all levels in order, across bands; Down / Up go to the row below /
-above, to its card nearest the current one horizontally (the first on a tie). A band that wraps
-(Expert, four cards) has two rows, stepped through before the next band (2026-11-09). With one
-card across (a phone) every card would be a row, so there Down / Up jump whole bands, to the
-band's first card. Both wrap.
+Right / Left go through all levels in order: along a row, off its end onto the next / previous
+row, round from the last level to the first; Down / Up go to the row below / above, to its card
+nearest the current one horizontally (the first on a tie), wrapping bottom to top. Rows are the
+on-screen rows across all bands (`levelRows`), so Expert's four cards are two rows.
+**Fixed for good (2026-11-15):** rows used to be grouped by EXACT card top, and the cursor lifts the
+selected card ~2 px, so it became a row of its own and Down bounced between two cards (01 <-> 02).
+Now a card within half a card's height of a row's first card is in that row. Never go back to exact
+comparisons. Test with `Page.reload` (a `Page.navigate` that only changes the `#` keeps the old script).
 
 - **Adding a level:** copy a whole `.level-slot` block into its tier's `.level-tier__levels` in
   `index.html` (a new tier: copy a whole `.level-tier` section and change its class and name), change the rank badge

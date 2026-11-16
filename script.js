@@ -1222,9 +1222,26 @@ window.addEventListener('load', () => {
     select(next, { direction });
   };
 
-  // Level Select groups the levels by difficulty tier. Right / Left go to the next / previous
-  // level in order, across tiers; Down / Up jump to the tier below / above, to the card there
-  // nearest the current one horizontally (the first one on a tie). Both wrap.
+  // Level Select's cards in on-screen rows, top to bottom across the tier bands (Expert, four
+  // cards three across, is two rows). Cards go in level order, so a card whose top is within
+  // half a card's height of the row's first card shares its row. Never compare tops exactly: the
+  // cursor lifts the selected card a pixel or two, which once made it a row of its own and
+  // left Up / Down stuck between two cards.
+  const levelRows = () => {
+    const rows = [];
+    levelCards.forEach((card) => {
+      const box = card.getBoundingClientRect();
+      const row = rows[rows.length - 1];
+      if (row && Math.abs(box.top - row.top) < box.height / 2) row.cards.push(card);
+      else rows.push({ top: box.top, cards: [card] });
+    });
+    return rows.map((row) => row.cards);
+  };
+
+  // Right / Left go to the next / previous level in order: along a row, off its end onto the
+  // next / previous row, and round from the last level to the first. Down / Up go to the row
+  // below / above, to its card nearest the current one horizontally (the first on a tie), and
+  // wrap from the bottom row to the top.
   const moveGridCursor = (key) => {
     const items = [...levelCards];
     const index = items.indexOf(selected);
@@ -1237,23 +1254,7 @@ window.addEventListener('load', () => {
       select(items[(index + direction + items.length) % items.length], { direction });
       return;
     }
-    // Up / Down go row by row: a band's rows, then the next band. A band with more cards than
-    // fit across (Expert has four) wraps onto a second row. With one card across (a phone),
-    // every card would be a row of its own, so there Up / Down jump whole bands instead.
-    const rowsOf = (tier) => {
-      const cards = [...tier.querySelectorAll('.level-card')];
-      const lefts = new Set(cards.map((card) => Math.round(card.getBoundingClientRect().left)));
-      if (lefts.size < 2) return [cards];
-      const byTop = new Map();
-      cards.forEach((card) => {
-        const top = Math.round(card.getBoundingClientRect().top);
-        byTop.set(top, [...(byTop.get(top) || []), card]);
-      });
-      return [...byTop.keys()].sort((a, b) => a - b).map((top) => byTop.get(top));
-    };
-    const rows = [...document.querySelectorAll('.level-select .level-tier')]
-      .filter((tier) => tier.querySelector('.level-card'))
-      .flatMap(rowsOf);
+    const rows = levelRows();
     const here = rows.findIndex((row) => row.includes(selected));
     const target = rows[(here + direction + rows.length) % rows.length];
     const centre = (card) => {
@@ -1261,8 +1262,7 @@ window.addEventListener('load', () => {
       return box.left + box.width / 2;
     };
     const x = centre(selected);
-    const cards = target;
-    const nearest = cards.reduce((best, card) =>
+    const nearest = target.reduce((best, card) =>
       Math.abs(centre(card) - x) < Math.abs(centre(best) - x) ? card : best);
     select(nearest, { direction });
   };
