@@ -172,8 +172,18 @@ landing screen that waits for one:
 Title menu (Level Select, Leaderboard, Options, Credits; Leaderboard above Options since 2026-11-14) > **Options** (`#options`) is a second menu in the same arcade style, with five
 pages: **About** (`#about`), **How to Play** (`#how-to-play`), **Controls** (`#controls`),
 **Rules** (`#rules`) and **Downloads / Installation** (`#downloads`). Each page is its own
-`<section class="view">` in `index.html` and currently shows an UNDER CONSTRUCTION placeholder
+`<section class="view">` in `index.html`; pages without content show an UNDER CONSTRUCTION placeholder
 (`.under-construction`); replace that block with the real content.
+
+**How to Play (2026-11-22):** the user's text, laid out as numbered steps (`.guide`, `.guide__step`,
+numbers from a CSS counter), with points in two-column tables (`.guide__table`, values in the numbers
+font, the top value of each in sunset `guide__value--hot`). Three of the user's rules were corrected to
+match the plugin: 1-2 wheels off the road cost nothing, 3 or more earn nothing (not "less per wheel");
+the 3 s with no multiplier is for wall / car contact and hard curb landings, while going off the road
+ends the drift (timer back to 10x) with no 3 s wait; the speed curve stops rising at 120 km/h. The
+numbers are the plugin's defaults (no level overrides them): change them together.
+Preview without the WELCOME screen: copy the section into a page that links `styles.css`. Headless Edge
+lays out at 500 px at the narrowest, whatever `--window-size` says.
 
 Planned content for Downloads / Installation: links to the sites where players download the
 cars and tracks.

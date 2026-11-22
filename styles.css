@@ -583,6 +583,128 @@ h3 {
   animation: promptBlink 1.2s steps(2, end) infinite;
 }
 
+/* Options > How to Play: numbered steps, each with notes and tables of points */
+.guide {
+  position: relative;
+  z-index: 1;
+  width: min(760px, 100%);
+  margin: 4px auto 12px;
+  padding: 0;
+  list-style: none;
+  counter-reset: guide;
+  display: grid;
+  gap: 14px;
+}
+
+.guide__step {
+  counter-increment: guide;
+  position: relative;
+  padding: 18px 22px 18px 74px;
+  border-radius: 16px;
+  border: 1px solid var(--line);
+  background: rgba(10, 12, 25, 0.6);
+}
+
+/* Step number, in the numbers face with the sunset gradient */
+.guide__step::before {
+  content: counter(guide, decimal-leading-zero);
+  position: absolute;
+  left: 20px;
+  top: 14px;
+  font: italic 600 1.7rem/1 var(--font-numbers);
+  background: linear-gradient(180deg, var(--sunset), var(--pink));
+  -webkit-background-clip: text;
+  background-clip: text;
+  color: transparent;
+}
+
+.guide__title {
+  font-size: clamp(0.95rem, 2vw, 1.08rem);
+  line-height: 1.35;
+  letter-spacing: 0.04em;
+}
+
+.guide__title em {
+  font-style: normal;
+  color: var(--sunset);
+  text-shadow: 0 0 14px rgba(255, 179, 71, 0.4);
+}
+
+.guide__text,
+.guide__notes {
+  margin: 10px 0 0;
+  color: var(--muted);
+  font-size: 1.08rem;
+  line-height: 1.5;
+}
+
+.guide__notes {
+  padding-left: 1.1em;
+}
+
+.guide__notes li + li {
+  margin-top: 4px;
+}
+
+.guide__notes li::marker {
+  color: var(--blue);
+}
+
+.guide__table {
+  margin: 12px 0 0;
+  display: grid;
+  grid-template-columns: minmax(0, 1fr) auto;
+  border-radius: 10px;
+  border: 1px solid rgba(68, 210, 255, 0.2);
+  background: rgba(68, 210, 255, 0.05);
+  overflow: hidden;
+}
+
+.guide__table dt,
+.guide__table dd {
+  margin: 0;
+  padding: 9px 14px;
+  border-top: 1px solid rgba(255, 255, 255, 0.06);
+}
+
+.guide__table dt:first-of-type,
+.guide__table dt:first-of-type + dd {
+  border-top: 0;
+}
+
+.guide__table dt {
+  font: 600 1.05rem/1.3 'Rajdhani', sans-serif;
+  letter-spacing: 0.02em;
+  color: var(--text);
+}
+
+.guide__table dd {
+  text-align: right;
+  font: italic 600 1.05rem/1.3 var(--font-numbers);
+  font-variant-numeric: tabular-nums;
+  color: var(--blue);
+  white-space: nowrap;
+}
+
+.guide__table dd.guide__value--hot {
+  color: var(--sunset);
+  text-shadow: 0 0 12px rgba(255, 179, 71, 0.45);
+}
+
+@media (max-width: 560px) {
+  .guide__step {
+    padding: 52px 16px 16px;
+  }
+
+  .guide__step::before {
+    left: 16px;
+  }
+
+  .guide__table dd {
+    white-space: normal;
+  }
+}
+
 .level-card {
   display: flex;
   flex-direction: column;

@@ -389,7 +389,8 @@
     </main>
   </section>
 
-  <!-- Options > How to Play: placeholder until its content is written -->
+  <!-- Options > How to Play. The numbers here are the plugin's defaults, which every level runs
+       (InitialDriftRunConfiguration.cs): change both together. -->
   <section class="view" id="viewHowToPlay" data-view="how-to-play" hidden>
     <main class="page">
       <section class="panel">
@@ -402,10 +403,66 @@
           <h2 class="level-select__title">How to Play</h2>
         </div>
 
-        <div class="under-construction">
-          <p class="under-construction__title">Under Construction</p>
-          <p class="under-construction__text">Coming soon</p>
-        </div>
+        <ol class="guide">
+          <li class="guide__step">
+            <h3 class="guide__title">The run starts when you cross the <em>START</em> line</h3>
+          </li>
+
+          <li class="guide__step">
+            <h3 class="guide__title">The faster you go, the faster you earn points</h3>
+            <ul class="guide__notes">
+              <li>Points build with the square of your speed, up to 120 km/h, so faster = better</li>
+              <li>With 3 or more wheels off the road you earn nothing until you are back on the road</li>
+            </ul>
+          </li>
+
+          <li class="guide__step">
+            <h3 class="guide__title">Drifting multiplies your points</h3>
+            <dl class="guide__table">
+              <dt>Up to 2 seconds in a row</dt><dd>10x</dd>
+              <dt>Over 2 seconds in a row</dt><dd>100x</dd>
+              <dt>Over 4 seconds in a row</dt><dd class="guide__value--hot">1000x!</dd>
+            </dl>
+            <ul class="guide__notes">
+              <li>Hitting a wall or a car, or a hard landing off a curb, switches the multiplier off for 3 seconds</li>
+              <li>Going off the road ends the drift, and the next one builds up from 10x again</li>
+            </ul>
+          </li>
+
+          <li class="guide__step">
+            <h3 class="guide__title">Overtakes</h3>
+            <dl class="guide__table">
+              <dt>Clean overtake</dt><dd>100,000 pts</dd>
+              <dt>Near miss overtake</dt><dd class="guide__value--hot">500,000 pts</dd>
+              <dt>Overtake with a collision</dt><dd>25,000 pts</dd>
+            </dl>
+          </li>
+
+          <li class="guide__step">
+            <h3 class="guide__title">Clear checkpoints for more time and a time bonus</h3>
+            <p class="guide__text">Each checkpoint adds time back to the countdown and pays for every second left on the clock:</p>
+            <dl class="guide__table">
+              <dt>Checkpoint 1</dt><dd>250,000 x time left</dd>
+              <dt>Checkpoint 2</dt><dd>500,000 x time left</dd>
+              <dt>Checkpoint 3</dt><dd>750,000 x time left</dd>
+              <dt>Finish line <span aria-hidden="true">🏁</span></dt><dd class="guide__value--hot">1,000,000 x time left</dd>
+            </dl>
+            <ul class="guide__notes">
+              <li>The time added back varies by checkpoint, tuned for each level's stages</li>
+            </ul>
+          </li>
+
+          <li class="guide__step">
+            <h3 class="guide__title">The run is complete when you cross the <em>FINISH</em> line</h3>
+          </li>
+
+          <li class="guide__step">
+            <h3 class="guide__title">Sign in with Steam to receive the passwords as you complete each level</h3>
+            <ul class="guide__notes">
+              <li>Passwords appear under each level on the Level Select screen, where you can show or hide them and copy them to paste into the server's password box</li>
+            </ul>
+          </li>
+        </ol>
       </section>
     </main>
   </section>
