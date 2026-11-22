@@ -182,6 +182,10 @@ match the plugin: 1-2 wheels off the road cost nothing, 3 or more earn nothing (
 the 3 s with no multiplier is for wall / car contact and hard curb landings, while going off the road
 ends the drift (timer back to 10x) with no 3 s wait; the speed curve stops rising at 120 km/h. The
 numbers are the plugin's defaults (no level overrides them): change them together.
+**Controls (2026-11-22):** the default keys from the plugin's `lua/driftrun.lua` (`controls` table, CONTROLS
+section), grouped Dash and HUD / Car / Music / Voice, then how to assign buttons from the dash's CONTROLS
+panel, with the user's point that a wheel button for the dash means using the keyboard only once. Same
+`.guide` cards without numbers (`.guide--plain`), keys as `<kbd>`. Change the page with the Lua's defaults.
 Preview without the WELCOME screen: copy the section into a page that links `styles.css`. Headless Edge
 lays out at 500 px at the narrowest, whatever `--window-size` says.
 

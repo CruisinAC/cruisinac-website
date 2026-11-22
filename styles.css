@@ -691,7 +691,63 @@ h3 {
   text-shadow: 0 0 12px rgba(255, 179, 71, 0.45);
 }
 
+.guide__text em,
+.guide__notes em {
+  font-style: normal;
+  color: var(--text);
+  font-weight: 600;
+}
+
+/* Controls page: same cards without step numbers */
+.guide--plain .guide__step {
+  padding-left: 22px;
+}
+
+.guide--plain .guide__step::before {
+  content: none;
+}
+
+.guide__text--lead {
+  margin: 0;
+  color: var(--text);
+}
+
+.guide__notes--steps {
+  padding-left: 1.4em;
+}
+
+.guide__notes--steps li::marker {
+  color: var(--sunset);
+  font: italic 600 1em var(--font-numbers);
+}
+
+.guide__table dd.guide__value--none {
+  color: var(--muted);
+  font: 500 1rem/1.3 'Rajdhani', sans-serif;
+}
+
+/* A key on the keyboard */
+.guide kbd {
+  display: inline-block;
+  min-width: 1.9em;
+  padding: 3px 8px 2px;
+  border-radius: 6px;
+  border: 1px solid rgba(68, 210, 255, 0.45);
+  border-bottom-width: 3px;
+  background: rgba(68, 210, 255, 0.1);
+  color: var(--text);
+  font: 700 0.8rem/1.2 'Orbitron', sans-serif;
+  font-style: normal;
+  letter-spacing: 0.04em;
+  text-align: center;
+  vertical-align: 1px;
+}
+
 @media (max-width: 560px) {
+  .guide--plain .guide__step {
+    padding: 16px;
+  }
+
   .guide__step {
     padding: 52px 16px 16px;
   }

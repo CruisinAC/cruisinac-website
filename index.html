@@ -467,7 +467,8 @@
     </main>
   </section>
 
-  <!-- Options > Controls: placeholder until its content is written -->
+  <!-- Options > Controls. The default keys are the `controls` table in the plugin's
+       lua/driftrun.lua (CONTROLS section): change both together. -->
   <section class="view" id="viewControls" data-view="controls" hidden>
     <main class="page">
       <section class="panel">
@@ -480,10 +481,70 @@
           <h2 class="level-select__title">Controls</h2>
         </div>
 
-        <div class="under-construction">
-          <p class="under-construction__title">Under Construction</p>
-          <p class="under-construction__text">Coming soon</p>
-        </div>
+        <ol class="guide guide--plain">
+          <li class="guide__step">
+            <p class="guide__text guide__text--lead">These are the default keys. Every one of them can be changed, and assigned to a button on your wheel or controller (see below).</p>
+          </li>
+
+          <li class="guide__step">
+            <h3 class="guide__title">Dash and HUD</h3>
+            <dl class="guide__table">
+              <dt>Open / close the DASH</dt><dd><kbd>F10</kbd></dd>
+              <dt>Race HUD on / off</dt><dd><kbd>Ctrl</kbd> + <kbd>D</kbd></dd>
+            </dl>
+            <ul class="guide__notes">
+              <li>The DASH is the car stereo: music, voice, HUD switches, MOVE HUD and CONTROLS</li>
+              <li>It also opens from the lightbulb menu in CSP's chat app: <em>DriftRun Dash</em></li>
+            </ul>
+          </li>
+
+          <li class="guide__step">
+            <h3 class="guide__title">Car</h3>
+            <dl class="guide__table">
+              <dt>Reset car to the road</dt><dd><kbd>R</kbd></dd>
+              <dt>Flip car upright (hold, under 15 km/h)</dt><dd><kbd>Delete</kbd></dd>
+            </dl>
+            <ul class="guide__notes">
+              <li>Reset puts the car back on the nearest part of the road, stopped and facing the way the race goes. Once every 2 seconds</li>
+              <li>Flip turns the car to face where the camera is looking</li>
+            </ul>
+          </li>
+
+          <li class="guide__step">
+            <h3 class="guide__title">Music</h3>
+            <dl class="guide__table">
+              <dt>Volume up / down (hold)</dt><dd><kbd>&uarr;</kbd> / <kbd>&darr;</kbd></dd>
+              <dt>Play / pause</dt><dd><kbd>&rarr;</kbd></dd>
+              <dt>Previous track</dt><dd><kbd>&larr;</kbd></dd>
+              <dt>Next track</dt><dd><kbd>Ctrl</kbd> + <kbd>&larr;</kbd></dd>
+              <dt>Back / forward 5 seconds</dt><dd class="guide__value--none">No default key</dd>
+            </dl>
+          </li>
+
+          <li class="guide__step">
+            <h3 class="guide__title">Voice</h3>
+            <dl class="guide__table">
+              <dt>Voice on / off</dt><dd><kbd>M</kbd></dd>
+              <dt>Voice volume up / down</dt><dd class="guide__value--none">No default key</dd>
+            </dl>
+          </li>
+
+          <li class="guide__step">
+            <h3 class="guide__title">Assign your own buttons</h3>
+            <ol class="guide__notes guide__notes--steps">
+              <li>Press <kbd>F10</kbd> to open the DASH</li>
+              <li>Click <em>CONTROLS</em> on the dash</li>
+              <li>Click the box next to a function, then press a key or a button on your wheel or controller. Right-click a box to clear it</li>
+              <li>Close the CONTROLS panel: your new buttons work as soon as it is closed</li>
+            </ol>
+            <ul class="guide__notes">
+              <li>Give <em>Open / close dash</em> a button on your wheel, and you only ever need the keyboard once: after that the wheel opens the DASH</li>
+              <li><kbd>F10</kbd> keeps opening the DASH whatever you assign, in case you lose track of a button</li>
+              <li>Your buttons are saved with Assetto Corsa's own controls, so they work on every level</li>
+              <li>The keys do nothing while you are typing in chat</li>
+            </ul>
+          </li>
+        </ol>
       </section>
     </main>
   </section>
