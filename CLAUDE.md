@@ -191,7 +191,7 @@ lays out at 500 px at the narrowest, whatever `--window-size` says.
 
 **Downloads / Installation (2026-11-22):** a numbered setup guide (`.guide`): Assetto Corsa (the three
 official cars are Japanese Pack DLC), Content Manager (https://acstuff.club/app/, the user's link), CSP
-(via CM's settings; x4fab's Patreon https://www.patreon.com/cw/x4fab, the user's link), the thirteen EK
+(via CM's settings, or the free download https://acstuff.club/patch/; x4fab's Patreon https://www.patreon.com/cw/x4fab, the user's link), the thirteen EK
 tracks with their `content/tracks` folder names (one link, the EK Patreon: every track download is listed on that one page),
 the SRP Car Pack with the cars it holds vs the DLC cars, then joining. Link buttons are `.guide__link`,
 which also arm the full-screen return (`expectFullscreenDrop`, like the Credits cards). The track and car
