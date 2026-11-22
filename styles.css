@@ -2350,6 +2350,12 @@ body .page {
   animation: acZoomIn 1.05s cubic-bezier(0.18, 0.86, 0.24, 1.08) forwards;
 }
 
+/* The whole logo shakes as AC lands with the crash. The delay is AC_LANDS_MS in script.js
+   (the 68% keyframe of acZoomIn), which the crash sound's impact is timed to: change together. */
+.intro--ac .intro__logo {
+  animation: logoImpactShake 480ms ease-out 714ms both;
+}
+
 .intro--cruisin .intro__layer--cruisin {
   animation: cruisinFlicker 1.35s linear forwards;
 }
@@ -2550,6 +2556,10 @@ body .page {
   .intro__press {
     animation-delay: 0s;
   }
+
+  .intro--ac .intro__logo {
+    animation: none;
+  }
 }
 
 body.is-loaded .hero,
@@ -2592,6 +2602,18 @@ body.is-loaded .credit-section {
     transform: translateX(0) scale(1);
     filter: blur(0) drop-shadow(0 0 24px rgba(68, 210, 255, 0.18));
   }
+}
+
+/* A hard jolt that dies away, like a camera taking the hit */
+@keyframes logoImpactShake {
+  0% { transform: translate(0, 0) rotate(0); }
+  8% { transform: translate(-10px, 6px) rotate(-0.7deg); }
+  18% { transform: translate(9px, -5px) rotate(0.6deg); }
+  30% { transform: translate(-7px, 3px) rotate(-0.4deg); }
+  42% { transform: translate(5px, -2px) rotate(0.25deg); }
+  56% { transform: translate(-3px, 1px) rotate(-0.1deg); }
+  72% { transform: translate(1px, 0) rotate(0); }
+  100% { transform: translate(0, 0) rotate(0); }
 }
 
 @keyframes cruisinFlicker {

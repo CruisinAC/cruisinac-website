@@ -156,7 +156,8 @@ landing screen that waits for one:
   put the crash a second early. Played through, the surf starts fading as the crash's tail dies away
   (`CRASH_TAIL_MS`) and reaches silence as the logo screen arrives; a skip fades every intro
   sound over 0.6 s. Phase timings and the crash alignment are the `INTRO_*`, `AC_LANDS_MS` and
-  `CRASH_IMPACT_MS` constants at the top of `script.js`; the intro order is now sun (3.2 s drop),
+  `CRASH_IMPACT_MS` constants at the top of `script.js`; as AC lands (the crash's impact) the whole logo shakes for 0.48 s
+  (`logoImpactShake`, delayed by `AC_LANDS_MS`, off with reduced motion; the user's request 2026-11-22); the intro order is now sun (3.2 s drop),
   then Cruisin' (as the sun settles, 2.7 s), a short pause, then the crash squeal and AC
   (5.15 s), Presents at 6.75 s (all from the start of the intro). Testing note: headless Edge with
   `--virtual-time-budget` never finishes decoding the large surf file, so check audio
