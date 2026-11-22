@@ -743,6 +743,30 @@ h3 {
   vertical-align: 1px;
 }
 
+/* Downloads page: link buttons under a step */
+.guide__links {
+  margin-top: 14px;
+  display: flex;
+  flex-wrap: wrap;
+  gap: 10px;
+}
+
+.guide__link {
+  min-width: auto;
+  padding: 11px 18px;
+  font-size: 0.8rem;
+}
+
+/* Track folder names, which players compare with their content/tracks folder */
+#viewDownloads .guide__table dd {
+  font: 500 0.98rem/1.3 'Rajdhani', sans-serif;
+  letter-spacing: 0.02em;
+}
+
+#viewDownloads .guide__table dd.guide__value--none {
+  font-style: normal;
+}
+
 @media (max-width: 560px) {
   .guide--plain .guide__step {
     padding: 16px;

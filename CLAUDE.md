@@ -189,8 +189,14 @@ panel, with the user's point that a wheel button for the dash means using the ke
 Preview without the WELCOME screen: copy the section into a page that links `styles.css`. Headless Edge
 lays out at 500 px at the narrowest, whatever `--window-size` says.
 
-Planned content for Downloads / Installation: links to the sites where players download the
-cars and tracks.
+**Downloads / Installation (2026-11-22):** a numbered setup guide (`.guide`): Assetto Corsa (the three
+official cars are Japanese Pack DLC), Content Manager (https://acstuff.club/app/, the user's link), CSP
+(via CM's settings; x4fab's Patreon https://www.patreon.com/cw/x4fab, the user's link), the thirteen EK
+tracks with their `content/tracks` folder names (link: the EK Patreon; there are no per-track links yet),
+the SRP Car Pack with the cars it holds vs the DLC cars, then joining. Link buttons are `.guide__link`,
+which also arm the full-screen return (`expectFullscreenDrop`, like the Credits cards). The track and car
+lists follow the servers' `TRACK=` / `CARS=` and the API's `game_servers.json` / `cars.json`: a new level
+or car swap changes this page too.
 
 Navigation: `VIEW_PARENT` at the top of `script.js` says where Back / Backspace goes from each view
 (a page -> Options -> title menu). Coming back to a menu puts the cursor on the item you left.

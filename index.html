@@ -570,7 +570,8 @@
     </main>
   </section>
 
-  <!-- Options > Downloads / Installation: placeholder until its content is written -->
+  <!-- Options > Downloads / Installation. The track and car lists follow the level servers'
+       server_cfg.ini (TRACK=, CARS=) and the API's game_servers.json / cars.json: change them together. -->
   <section class="view" id="viewDownloads" data-view="downloads" hidden>
     <main class="page">
       <section class="panel">
@@ -583,10 +584,94 @@
           <h2 class="level-select__title">Downloads / Installation</h2>
         </div>
 
-        <div class="under-construction">
-          <p class="under-construction__title">Under Construction</p>
-          <p class="under-construction__text">Coming soon</p>
-        </div>
+        <ol class="guide">
+          <li class="guide__step">
+            <h3 class="guide__title">Assetto Corsa on Steam</h3>
+            <ul class="guide__notes">
+              <li>The Toyota AE86 Tuned, Toyota Supra MKIV and Mazda RX-7 Spirit R are official cars from the <em>Japanese Pack</em> DLC, which is part of the Ultimate Edition</li>
+            </ul>
+          </li>
+
+          <li class="guide__step">
+            <h3 class="guide__title">Content Manager</h3>
+            <p class="guide__text">The launcher that joins our servers. The free version is all you need.</p>
+            <div class="guide__links">
+              <a class="button guide__link" href="https://acstuff.club/app/" target="_blank" rel="noreferrer">Get Content Manager</a>
+            </div>
+          </li>
+
+          <li class="guide__step">
+            <h3 class="guide__title">Custom Shaders Patch (CSP)</h3>
+            <p class="guide__text">Runs the game mode itself: the HUD, the DASH, the music and the scoring all need it. Use the latest version.</p>
+            <ul class="guide__notes">
+              <li>Install it from Content Manager: <em>Settings &gt; Custom Shaders Patch</em></li>
+              <li>The newest builds come out first on x4fab's Patreon</li>
+            </ul>
+            <div class="guide__links">
+              <a class="button button--ghost guide__link" href="https://www.patreon.com/cw/x4fab" target="_blank" rel="noreferrer">CSP on Patreon</a>
+            </div>
+          </li>
+
+          <li class="guide__step">
+            <h3 class="guide__title">The tracks: EK Track Mods</h3>
+            <p class="guide__text">Every level is a track by Euro and Kozzren, free to download from their Patreon. Get all thirteen:</p>
+            <dl class="guide__table">
+              <dt>01 Myogi</dt><dd>ek_myogi</dd>
+              <dt>02 Momiji Line</dt><dd>ek_momiji</dd>
+              <dt>03 Akagi</dt><dd>ek_akagi</dd>
+              <dt>04 Tsukuba Fruits Line</dt><dd>ek_tsukuba_fruits_line</dd>
+              <dt>05 Sadamine</dt><dd>ek_sadamine</dd>
+              <dt>06 Mt Akina</dt><dd>ek_akina</dd>
+              <dt>07 Hakone Turnpike</dt><dd>ek_hakone_turnpike</dd>
+              <dt>08 Nagao</dt><dd>ek_nagao</dd>
+              <dt>09 Tsuchisaka</dt><dd>ek_tsuchisaka</dd>
+              <dt>10 Nanamagari</dt><dd>ek_nanamagari</dd>
+              <dt>11 Tsubaki Line</dt><dd>ek_tsubaki_line</dd>
+              <dt>12 Happogahara</dt><dd>ek_happogahara</dd>
+              <dt>13 Irohazaka</dt><dd>ek_irohazaka</dd>
+            </dl>
+            <ul class="guide__notes">
+              <li>To install, drag each downloaded archive onto the Content Manager window and click <em>Install</em></li>
+              <li>The right column is the track's folder name in <em>content/tracks</em>, so you can check what you already have</li>
+            </ul>
+            <div class="guide__links">
+              <a class="button guide__link" href="https://www.patreon.com/c/u38695696/posts" target="_blank" rel="noreferrer">EK Track Mods on Patreon</a>
+            </div>
+          </li>
+
+          <li class="guide__step">
+            <h3 class="guide__title">The cars and traffic: SRP Car Pack</h3>
+            <p class="guide__text">The Car Pack from the Shutoko Revival Project has the other seven cars and every traffic car on our servers:</p>
+            <dl class="guide__table">
+              <dt>Toyota Supra 3.0GT Turbo A</dt><dd>Car Pack</dd>
+              <dt>Nissan Skyline GT-R V-Spec II (R32)</dt><dd>Car Pack</dd>
+              <dt>Mazda RX-7 Infini</dt><dd>Car Pack</dd>
+              <dt>Subaru Impreza 22B STi-Version</dt><dd>Car Pack</dd>
+              <dt>Mitsubishi Lancer Evolution VIII MR</dt><dd>Car Pack</dd>
+              <dt>Nissan Silvia spec-R Aero</dt><dd>Car Pack</dd>
+              <dt>Honda S2000 (AP1)</dt><dd>Car Pack</dd>
+              <dt>Traffic cars</dt><dd>Car Pack</dd>
+              <dt>Toyota AE86 Tuned</dt><dd class="guide__value--none">Japanese Pack DLC</dd>
+              <dt>Toyota Supra MKIV</dt><dd class="guide__value--none">Japanese Pack DLC</dd>
+              <dt>Mazda RX-7 Spirit R</dt><dd class="guide__value--none">Japanese Pack DLC</dd>
+            </dl>
+            <ul class="guide__notes">
+              <li>Install it the same way: drag the archive onto Content Manager</li>
+            </ul>
+            <div class="guide__links">
+              <a class="button guide__link" href="https://shutokorevivalproject.com/" target="_blank" rel="noreferrer">Get the SRP Car Pack</a>
+            </div>
+          </li>
+
+          <li class="guide__step">
+            <h3 class="guide__title">Join a level</h3>
+            <ul class="guide__notes">
+              <li>Pick a level on the <em>Level Select</em> screen: Content Manager opens and joins the server. Level 1 needs no password</li>
+              <li>Sign in with Steam on this site so the next level's password shows up when you finish one</li>
+              <li>Content Manager says a file differs from the server's? Download the latest version of that track or of the Car Pack and install it again</li>
+            </ul>
+          </li>
+        </ol>
       </section>
     </main>
   </section>

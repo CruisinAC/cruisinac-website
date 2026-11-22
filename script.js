@@ -1303,7 +1303,7 @@ window.addEventListener('load', () => {
     });
   });
 
-  document.querySelectorAll('.credit-card').forEach((card) => card.addEventListener('click', () => {
+  document.querySelectorAll('.credit-card, .guide__link').forEach((card) => card.addEventListener('click', () => {
     Sfx.select();
     expectFullscreenDrop();
   }));
