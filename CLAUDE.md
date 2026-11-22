@@ -35,6 +35,7 @@ Copied from `C:\Users\mannr\Pictures\CruisinAC-Logo-images\` (originals untouche
 | `wolf-and-raven-logo.jpg` | 800x800, black background | Wolf and Raven logo: chrome script, red sun, wolf and raven silhouette |
 | `ek-track-mods-banner.webp` | 1600x400, ~810 KB | EK Track Mods banner (`ek_project_banner.webp`), for the track credit. Lazy-loaded, so only a Credits visit fetches it |
 | `srp-logo-main-white.svg` | ~6 KB, vector, white on transparent | Shutoko Revival Project logo, for the car credit. Their site states no terms for its use |
+| `assettoserver-logo.svg` | ~2 KB, vector, red and white on transparent | AssettoServer logo (the user's file), for the server credit |
 | `initial_driftrun_logo_v0.1.svg` | 900x400, ~250 KB (embedded PNGs) | Initial DriftRun logo: chrome "INITIAL", red "D", chrome "RIFTRUN". Used on the title screen, Level Select and Leaderboard (replaced `initial-driftrun-placeholder.svg`, 2026-10-10) |
 
 The three `logo-layer-*` files share the same 700x678 canvas, so stacking them exactly
@@ -75,6 +76,11 @@ link, which would go stale). Keep the wording to "modded cars and traffic":
   `ddm_toyota_supra_ma70` on every server. Both are in pack 3.6, and their `data.acd` is identical
   to the servers' copies, so players with the pack pass the checksum.
 - The site does not say the pack is free, so the page does not either.
+
+## Server Credit (2026-11-22)
+The fourth Credits section, below the cars: **AssettoServer** (by compujuckel and contributors, AGPL),
+which runs every level and its AI traffic, linking to **https://assettoserver.org/**. Same layout as the
+SRP card (`.credit-card__banner--logo`).
 
 ## Opening Sequence and Sound (2026-10-10)
 Browsers allow no sound until the visitor clicks, taps or presses a key, so the site opens on a
