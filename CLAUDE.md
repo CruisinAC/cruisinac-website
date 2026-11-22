@@ -52,7 +52,8 @@ The in-game music is by **Wolf and Raven** (albums "Tribute to OutRun" and "Toky
 The site must credit them visibly, with their logo and a link to
 **https://www.wolfandravenmusic.com/**.
 Since 2026-11-22 its card is a banner like the other three: the square logo (on its own black) sits
-centred in the dark panel as a rounded tile (`.credit-card__banner--cover`), text below.
+centred in a black banner the size of the EK one (`.credit-card__banner--cover`, 4:1, at least 170 px tall),
+so its black square melts into the panel and the artwork fills the height (a small tile looked bad, the user).
 
 ## Track Credit (2026-10-30)
 All six levels' tracks are by **Euro and Kozzren** (`ui_track.json` author on each `ek_*` track),

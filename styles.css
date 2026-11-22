@@ -1831,20 +1831,25 @@ body .page {
   background: rgba(0, 0, 0, 0.35);
 }
 
-/* A square logo on its own black (Wolf and Raven): centred in the banner panel like the
-   other logos, as a rounded tile so its black square sits cleanly on the panel */
+/* A square logo on its own black (Wolf and Raven): a black banner the size of the EK one, so
+   the logo's black square melts into it and the artwork fills the height */
 .credit-card__banner--cover {
-  display: flex;
-  justify-content: center;
-  align-items: center;
-  padding: 14px;
+  position: relative;
+  height: auto;
+  min-height: 170px;
+  aspect-ratio: 4;
+  padding: 0;
+  overflow: hidden;
+  background: #000;
 }
 
 .credit-card__banner--cover img {
+  position: absolute;
+  top: 0;
+  left: 50%;
   height: 100%;
   aspect-ratio: 1;
-  border-radius: 12px;
-  border: 1px solid rgba(255, 255, 255, 0.08);
+  transform: translateX(-50%);
 }
 
 .credit-card + .section-heading {
