@@ -51,6 +51,8 @@ Never use any `password_unlock_*.png` image - those contain real level passwords
 The in-game music is by **Wolf and Raven** (albums "Tribute to OutRun" and "Tokyo Turbo").
 The site must credit them visibly, with their logo and a link to
 **https://www.wolfandravenmusic.com/**.
+Since 2026-11-22 its card is a banner like the other three: the square logo (on its own black) sits
+centred in the dark panel as a rounded tile (`.credit-card__banner--cover`), text below.
 
 ## Track Credit (2026-10-30)
 All six levels' tracks are by **Euro and Kozzren** (`ui_track.json` author on each `ek_*` track),
